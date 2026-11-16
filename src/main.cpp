@@ -5,6 +5,7 @@
 #include <fileapi.h>
 #include <cstdio>
 #include <fstream>
+#include "SDL3/SDL_events.h"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_keyboard.h"
 #include "SDL3/SDL_mouse.h"
@@ -242,6 +243,10 @@ int main() {
         
         SDL_Event event;
         while(SDL_PollEvent(&event)){
+            if(event.type == SDL_EVENT_QUIT){
+                gameData->running = false;
+                break;
+            }
 
             gameData->running = dll.handleEvents(gameData, event);
             if(gameData->running == false){
