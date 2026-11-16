@@ -32,8 +32,8 @@ SDL_Renderer* renderer;
 Uint64 NOW = 0;
 Uint64 PREV = 0;
 
-constexpr const char* NAME_OF_DLL = "hellofatime_game.dll";
-constexpr const char* NAME_OF_TEMP_DLL = "hellofatime_temp.dll";
+constexpr const char* NAME_OF_DLL = "lost_in_orbit_game.dll";
+constexpr const char* NAME_OF_TEMP_DLL = "lost_in_orbit_temp.dll";
 
 typedef void (*Function_Initialize) (GameData* data, SDL_Window* window, SDL_Renderer* renderer);
 typedef bool (*Function_HandleEvents) (GameData* data, SDL_Event event);
@@ -119,7 +119,7 @@ void SDL_Setup(){
     SDL_SetLogPriorities(SDL_LOG_PRIORITY_VERBOSE);
     TTF_Init();
 
-    window = SDL_CreateWindow("hell of a time", SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+    window = SDL_CreateWindow("lost in orbit", SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     renderer = SDL_CreateRenderer(window, NULL);
 }
 
