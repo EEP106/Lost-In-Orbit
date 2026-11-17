@@ -58,6 +58,9 @@ entity->behaviour = (Behaviour)(entity->behaviour & ~flags);
 
 // Leftover from base project
 void PostMove(Entity *entity, LevelData* level, CommandBuffer* commandBuffer){
+  if (entity->id == ENTITY_ID::ROCK) {
+
+  }
 }
 void PostRotation(Entity* entity, LevelData* level, CommandBuffer* commandBuffer, Direction from, Direction to){
 }
