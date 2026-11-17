@@ -131,9 +131,10 @@ extern "C" {
       else{
         Undo(gameplay->commandBuffer, GetCurrentLevel(gameplay));
       }
-    }
-    bool can_accept_input =! are_entities_acting && gameplay->input_buffer_read_count == gameplay->input_buffer_write_count;
-    if (can_accept_input)
+    }    
+    int maxInputs = 2;
+    int queued_inputs = (int)(gameplay->input_buffer_write_count - gameplay->input_buffer_read_count);
+    if (queued_inputs < maxInputs)
     {
       if(KeyPressed(input,SDL_SCANCODE_RIGHT) || KeyHeld_ForTime(input,SDL_SCANCODE_RIGHT, (1 / MOVE_SPEED) * 1.15)){
       ResetKeyHeldTime(input, SDL_SCANCODE_RIGHT);
