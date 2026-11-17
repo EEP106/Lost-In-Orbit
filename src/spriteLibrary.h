@@ -12,6 +12,7 @@ enum class SPRITE_ID{
   Medusa_Idle_Back,
   Dropshadow,
   titlescreen_background,
+  space_test_backround,
   black_1x1,
   dungeon_tileset,
   selection_marker,
