@@ -20,7 +20,6 @@
 #include "arena.h"
 #include "entity.h"
 #include "gameState.h"
-#include "image.h"
 #include "input.h"
 #include "spriteLibrary.h"
 

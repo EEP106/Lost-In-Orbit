@@ -9,7 +9,6 @@
 #include "dev_gui.h"
 #include "command.h"
 #include "entity.h"
-#include "entityrenderer.h"
 #include "fontLibrary.h"
 #include "gameState.h"
 #include "imgui/imgui.h"
