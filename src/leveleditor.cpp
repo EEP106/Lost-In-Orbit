@@ -15,22 +15,8 @@ namespace EDITOR {
     }
     
     ImGui::SameLine();
-    if(ImGui::ImageButton("Demon", (ImTextureID)GetSprite(SPRITE_ID::Demon, spriteBuffer)->texture, size)){
-     editor->object_to_place_id = ENTITY_ID::DEMON;
-    }
-    ImGui::SameLine();
     if(ImGui::ImageButton("Medusa", (ImTextureID)GetSprite(SPRITE_ID::Medusa_Rotate, spriteBuffer)->texture, size)){
-     editor->object_to_place_id = ENTITY_ID::MEDUSA;
-    }
-
-    ImGui::SameLine();
-    if(ImGui::ImageButton("Siren", (ImTextureID)GetSprite(SPRITE_ID::Siren, spriteBuffer)->texture, size)){
-     editor->object_to_place_id = ENTITY_ID::SIREN;
-    }
-    ImGui::SameLine();
-    
-    if(ImGui::ImageButton("Golem", (ImTextureID)GetSprite(SPRITE_ID::Golem, spriteBuffer)->texture, size)){
-     editor->object_to_place_id = ENTITY_ID::GOLEM;
+     editor->object_to_place_id = ENTITY_ID::PLAYER;
     }
 
     ImGui::End();

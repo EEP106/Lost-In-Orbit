@@ -13,7 +13,6 @@ const char* FALLBACK_PATH = "assets/sprites/fallback.png";
 
 static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Fallback, FALLBACK_PATH,8,8},
-  {SPRITE_ID::Demon, "assets/sprites/player.png"},
   {SPRITE_ID::Rock, "assets/sprites/rock.png", 10, 18},
   {SPRITE_ID::Medusa_Rotate, "assets/sprites/medusa_rotate.png", 12, 24, 8, 1},
 {
@@ -41,13 +40,8 @@ static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Button_Basic, "assets/sprites/basic_button.png",0,0,3,3},
   };
 
-SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer, const uint64_t* ticks_total){
-    if(HasBehaviour(entity, Behaviour::IS_PETRIFIED)){
-    return GetSprite(SPRITE_ID::Rock, spritebuffer);
-  }
-
-  
-  if(entity->id == ENTITY_ID::MEDUSA && entity->action == Actions::ROTATING){
+SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer, const uint64_t* ticks_total){  
+  if(entity->id == ENTITY_ID::PLAYER && entity->action == Actions::ROTATING){
     Sprite* spritesheet = GetSprite(SPRITE_ID::Medusa_Rotate, spritebuffer);
      
     int start = 0;
@@ -91,7 +85,7 @@ SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer,
   }
 
   switch (entity->id) {
-  case ENTITY_ID::MEDUSA:{
+  case ENTITY_ID::PLAYER:{
   Sprite* sprite = nullptr;
   int frame = 0;
     switch (entity->facing_current) {
@@ -113,8 +107,6 @@ SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer,
         return {frame, sprite};
       }
   }
-  case ENTITY_ID::DEMON:
-    return GetSprite(SPRITE_ID::Demon, spritebuffer);
   case ENTITY_ID::ROCK:
     return GetSprite(SPRITE_ID::Rock, spritebuffer);
   default:
@@ -135,20 +127,11 @@ Sprite* GetSpriteFromID(ENTITY_ID id, Sprite* spriteBuffer){
   Sprite* sprite_to_return = nullptr;
   
  switch (id) {
- case ENTITY_ID::DEMON:
-   sprite_to_return = &spriteBuffer[(int)SPRITE_ID::Demon];
-   break;
  case ENTITY_ID::ROCK:
    sprite_to_return = &spriteBuffer[(int)SPRITE_ID::Rock];
    break;
- case ENTITY_ID::MEDUSA:
+ case ENTITY_ID::PLAYER:
    sprite_to_return = nullptr;
-   break;
- case ENTITY_ID::SIREN:
-   sprite_to_return = &spriteBuffer[(int)SPRITE_ID::Siren];
-   break;
- case ENTITY_ID::GOLEM:
-   sprite_to_return = &spriteBuffer[(int)SPRITE_ID::Golem];
    break;
   }
 

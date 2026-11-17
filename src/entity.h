@@ -11,11 +11,9 @@ enum Behaviour : uint32_t {
   CAN_MOVE = 1 << 0,
   IS_PLAYER = 1 << 1,
   RESPOND_TO_INPUT = 1 << 2,
-  IS_PETRIFIED = 1 << 3,
-  CAN_ROTATE = 1 << 4,
-  UNPUSHABLE = 1 << 5,
-  JUMPS = 1 << 6,
-  IS_PUSHING = 1 << 7
+  CAN_ROTATE = 1 << 3,
+  JUMPS = 1 << 4,
+  IS_PUSHING = 1 << 5,
 };
 
 enum class Actions {
@@ -40,11 +38,8 @@ inline Direction DirectionFromXY(int xDir, int yDir){
 }
 
 enum class ENTITY_ID : uint8_t {
-  MEDUSA = 0,
-  DEMON = 1,
+  PLAYER = 0,
   ROCK = 2,
-  SIREN = 3,
-  GOLEM = 4,
 };
 
 struct Position{

@@ -6,13 +6,10 @@
 enum class SPRITE_ID{
   Fallback,
   Rock,
-  Demon,
   Medusa_Rotate,
   Medusa_Idle_Left,
   Medusa_Idle_Front,
   Medusa_Idle_Back,
-  Golem,
-  Siren,
   Dropshadow,
   titlescreen_background,
   black_1x1,

@@ -250,9 +250,6 @@ extern "C" {
       return;
     }
     
-    if(HasBehaviour(entity, Behaviour::IS_PETRIFIED)){
-      return;
-    }
     int xDir = gameplay->input_buffer[gameplay->input_buffer_read_count % gameplay->input_buffer_capacity].x;
     int yDir = gameplay->input_buffer[gameplay->input_buffer_read_count % gameplay->input_buffer_capacity].y;
 
@@ -357,7 +354,7 @@ extern "C" {
       return false;
     }
       
-    if(HasBehaviour(stepInto_entity, CAN_MOVE) && !HasBehaviour(stepInto_entity, UNPUSHABLE)){
+    if(HasBehaviour(stepInto_entity, CAN_MOVE)){
       if(TryMove(stepInto_entity, level,commandBuffer, xDir, yDir, --strength)){
         MoveCommand mv(mover, xDir, yDir);
         AddBehaviour(mover, Behaviour::IS_PUSHING);
