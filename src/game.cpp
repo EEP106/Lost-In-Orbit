@@ -108,7 +108,17 @@ extern "C" {
       return;
     }
 
-    
+    bool are_entities_acting = false;
+    LevelData *level = GetCurrentLevel(gameplay);
+    Entity* entityBuffer = level->entityBuffer;
+
+    for (int i = 0; i < level->entityCount; i++){
+      if(IsActing(&entityBuffer[i])){
+        are_entities_acting = true;
+        break;
+      }
+    }
+
     float undo_speed_up = std::lerp(1.0, 0.15, (gameplay->commandBuffer->head - gameplay->commandBuffer->index) * (1.0/30.0));
     if(undo_speed_up < 0.15){
       undo_speed_up = 0.15;
@@ -122,8 +132,10 @@ extern "C" {
         Undo(gameplay->commandBuffer, GetCurrentLevel(gameplay));
       }
     }
-   
-    if(KeyPressed(input,SDL_SCANCODE_RIGHT) || KeyHeld_ForTime(input,SDL_SCANCODE_RIGHT, (1 / MOVE_SPEED) * 1.15)){
+    bool can_accept_input =! are_entities_acting && gameplay->input_buffer_read_count == gameplay->input_buffer_write_count;
+    if (can_accept_input)
+    {
+      if(KeyPressed(input,SDL_SCANCODE_RIGHT) || KeyHeld_ForTime(input,SDL_SCANCODE_RIGHT, (1 / MOVE_SPEED) * 1.15)){
       ResetKeyHeldTime(input, SDL_SCANCODE_RIGHT);
       gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {1, 0};
     }
@@ -139,18 +151,8 @@ extern "C" {
       ResetKeyHeldTime(input, SDL_SCANCODE_DOWN);
       gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {0, 1};
     }
-    
-    
-    bool are_entities_acting = false;
-    LevelData *level = GetCurrentLevel(gameplay);
-    Entity* entityBuffer = level->entityBuffer;
-
-    for (int i = 0; i < level->entityCount; i++){
-      if(IsActing(&entityBuffer[i])){
-        are_entities_acting = true;
-        break;
-      }
     }
+
 
     for (int i = 0; i < level->goalCount; i++) {
       Entity* entity = GetEntity(level, level->goals[i].x, level->goals[i].y);
