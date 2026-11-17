@@ -692,6 +692,20 @@
                  "type":"bool",
                  "value":false
                 }]
+        }, 
+        {
+         "id":76,
+         "properties":[
+                {
+                 "name":"toxic",
+                 "type":"bool",
+                 "value":true
+                }, 
+                {
+                 "name":"walkable",
+                 "type":"bool",
+                 "value":true
+                }]
         }],
  "tilewidth":16,
  "type":"tileset",
