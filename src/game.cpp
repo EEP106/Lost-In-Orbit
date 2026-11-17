@@ -352,12 +352,17 @@ extern "C" {
       }
       return false;
     }
-      
+
     if(HasBehaviour(stepInto_entity, CAN_MOVE)){
       if(TryMove(stepInto_entity, level,commandBuffer, xDir, yDir, --strength)){
         MoveCommand mv(mover, xDir, yDir);
         AddBehaviour(mover, Behaviour::IS_PUSHING);
         Push(commandBuffer, mv, level);
+        if (GetCellID(level, stepInto_entity->x, stepInto_entity->y) == 76) {
+          printf("Rock reached acid");
+          RemoveBehaviour(stepInto_entity, CAN_MOVE);
+          R
+        }
         return true;
       }
     }
