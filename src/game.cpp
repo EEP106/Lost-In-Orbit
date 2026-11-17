@@ -360,8 +360,8 @@ extern "C" {
         Push(commandBuffer, mv, level);
         if (GetCellID(level, stepInto_entity->x, stepInto_entity->y) == 76) {
           printf("Rock reached acid");
-          RemoveBehaviour(stepInto_entity, CAN_MOVE);
-          R
+          RemoveEntity(stepInto_entity->x, stepInto_entity->y, level);
+          
         }
         return true;
       }
