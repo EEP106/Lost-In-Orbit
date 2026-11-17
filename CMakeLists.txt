@@ -69,9 +69,12 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 )
 
 # Copy assets folder
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${DIR_ASSETS_ORIGIN} ${DIR_ASSETS_DESTINATION} VERBATIM
+add_custom_target(copy_assets ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
+        ${DIR_ASSETS_ORIGIN} ${DIR_ASSETS_DESTINATION}
+    VERBATIM
 )
+add_dependencies(${PROJECT_NAME} copy_assets)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION .)
 install(TARGETS ${DLL_NAME} RUNTIME DESTINATION .)
