@@ -706,6 +706,15 @@
                  "type":"bool",
                  "value":true
                 }]
+        }, 
+        {
+         "id":77,
+         "properties":[
+                {
+                 "name":"walkable",
+                 "type":"bool",
+                 "value":true
+                }]
         }],
  "tilewidth":16,
  "type":"tileset",
