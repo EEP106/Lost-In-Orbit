@@ -39,7 +39,7 @@ switch (entity->id) {
     entity->strength = 1;
     break;  
   case ENTITY_ID::ROCK:
-    SetBehaviour(entity, (Behaviour)CAN_MOVE);
+    SetBehaviour(entity, (Behaviour)(CAN_MOVE | ONTO_TOXIC));
     break;
   }
 }
@@ -58,9 +58,6 @@ entity->behaviour = (Behaviour)(entity->behaviour & ~flags);
 
 // Leftover from base project
 void PostMove(Entity *entity, LevelData* level, CommandBuffer* commandBuffer){
-  if (entity->id == ENTITY_ID::ROCK) {
-
-  }
 }
 void PostRotation(Entity* entity, LevelData* level, CommandBuffer* commandBuffer, Direction from, Direction to){
 }

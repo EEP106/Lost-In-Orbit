@@ -346,6 +346,10 @@ extern "C" {
     uint16_t stepInto_tile_id = GetCellID(level, test_x, test_y);
     if(stepInto_entity == nullptr){
       if(IsWalkable(test_x, test_y, level)){
+        if (IsToxic(test_x, test_y, level) && !HasBehaviour(mover, ONTO_TOXIC)) {
+          return false;
+        }
+        printf("Mover type is = %d\n", HasBehaviour(mover, IS_PLAYER));
         MoveCommand mv(mover, xDir, yDir);
         Push(commandBuffer, mv, level);
         return true;

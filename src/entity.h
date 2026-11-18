@@ -14,7 +14,7 @@ enum Behaviour : uint32_t {
   CAN_ROTATE = 1 << 3,
   JUMPS = 1 << 4,
   IS_PUSHING = 1 << 5,
-  OVER_TOXIC = 1 << 6,
+  ONTO_TOXIC = 1 << 6,
 };
 
 enum class Actions {
