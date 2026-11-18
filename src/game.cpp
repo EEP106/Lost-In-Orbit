@@ -21,6 +21,7 @@
 #include "levelRenderer.h"
 #include "tilesetLibrary.h"
 #include <cmath>
+#include <algorithm>
 
 extern "C" {
 
@@ -375,11 +376,15 @@ extern "C" {
       case SCENE_TYPES::MAINMENU:
         DrawMenu(&data->scenes.mainMenu, renderer, data->spriteBuffer, &data->input);
         break;
-      case SCENE_TYPES::GAME:
-        SDL_RenderTexture(renderer, GetSprite(SPRITE_ID::space_test_backround, data->spriteBuffer)->texture, nullptr, nullptr);
-        RenderLevel(data, renderer);  
+      case SCENE_TYPES::GAME:{
+        Sprite* bg = GetSprite(SPRITE_ID::space_test_backround, data->spriteBuffer);
+        int w, h;
+        SDL_GetCurrentRenderOutputSize(renderer, &w, &h);
+        float scale = std::max((float)w / bg->width, (float)h / bg->height) / UPSCALE_FACTOR;
+        RenderSprite_World(bg, renderer, nullptr, w / 2.0f, h / 2.0f, scale);
+        RenderLevel(data, renderer);
         RenderEntities(data, renderer);
-        break;
+        break;}
       case SCENE_TYPES::CREDITS:
         break;
       case SCENE_TYPES::NONE:
