@@ -398,6 +398,7 @@ extern "C" {
     int w, h;
     SDL_GetCurrentRenderOutputSize(renderer, &w, &h);
     camera::SetScreenSize((float)w, (float)h);
+    data->scenes.mainMenu.SetScreenSize((float)w, (float)h);
     SDL_SetRenderDrawColor(renderer, 120, 70, 120, 255);
     SDL_RenderClear(renderer);
 
