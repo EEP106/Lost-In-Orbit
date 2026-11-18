@@ -376,7 +376,7 @@ extern "C" {
         DrawMenu(&data->scenes.mainMenu, renderer, data->spriteBuffer, &data->input);
         break;
       case SCENE_TYPES::GAME:
-        RenderSprite_World(GetSprite(SPRITE_ID::space_test_backround, data->spriteBuffer), renderer, nullptr, SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f);
+        SDL_RenderTexture(renderer, GetSprite(SPRITE_ID::space_test_backround, data->spriteBuffer)->texture, nullptr, nullptr);
         RenderLevel(data, renderer);  
         RenderEntities(data, renderer);
         break;
