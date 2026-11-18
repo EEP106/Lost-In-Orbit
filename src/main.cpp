@@ -260,6 +260,7 @@ int main() {
                 if(event.key.key == SDLK_F10){
                     RetrieveGameState(arena_main);
                 }
+                // Press F for fullscreen and F again to return to original window size
                 if(event.key.key == SDLK_F && !event.key.repeat){
                     bool is_fullscreen = (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN) != 0;
                     SDL_SetWindowFullscreen(window, !is_fullscreen);
