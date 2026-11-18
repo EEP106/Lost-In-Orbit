@@ -16,6 +16,7 @@ enum class TILESETS {
 struct Tileset{
   TILESETS type;
   bool* walkableBuffer;
+  bool* toxicBuffer;
 };
 
 struct TilesetDataEntry{

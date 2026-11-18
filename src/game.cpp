@@ -358,10 +358,9 @@ extern "C" {
         MoveCommand mv(mover, xDir, yDir);
         AddBehaviour(mover, Behaviour::IS_PUSHING);
         Push(commandBuffer, mv, level);
-        if (GetCellID(level, stepInto_entity->x, stepInto_entity->y) == 76) {
+        if (IsToxic(stepInto_entity->x, stepInto_entity->y, level)) {
           printf("Rock reached acid");
           RemoveEntity(stepInto_entity->x, stepInto_entity->y, level);
-          
         }
         return true;
       }

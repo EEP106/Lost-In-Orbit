@@ -133,6 +133,11 @@ bool IsWalkable(int x, int y, LevelData* level){
   return level->tileset->walkableBuffer[id];
 }
 
+bool IsToxic(int x, int y, LevelData* level) {
+  uint16_t id = GetCellID(level, x, y);
+  return level->tileset->toxicBuffer[id];
+  }
+
  uint16_t GetCellID(LevelData* level, int x, int y){
     return level->cells[y * level->w + x];
   }

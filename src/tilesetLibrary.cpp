@@ -45,6 +45,7 @@ namespace AssetManagement{
     auto jsonResult = json::parse(stream);
     int tile_count = jsonResult["tilecount"].get<int>();
     tileset->walkableBuffer = ALLOC_ARRAY(arena_images, bool, tile_count);
+    tileset->toxicBuffer = ALLOC_ARRAY(arena_images, bool, tile_count);
     
     auto& tiles = jsonResult["tiles"];
 
@@ -54,6 +55,9 @@ namespace AssetManagement{
       for(const auto& tile_property : tile["properties"]){
         if(tile_property["name"] == "walkable"){
           tileset->walkableBuffer[tile_id] = tile_property["value"].get<bool>();
+        }
+        if (tile_property["name"] == "toxic") {
+          tileset->toxicBuffer[tile_id] = tile_property["value"].get<bool>();
         }
       }
     }

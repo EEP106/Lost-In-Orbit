@@ -26,6 +26,7 @@ struct LevelData{
 
 
 bool IsWalkable(int x, int y, LevelData* level);
+bool IsToxic(int x, int y, LevelData* level);
 void CreateLevel(Arena* arena, LevelData* level, Tileset* tileset, const char* level_name);
 void CreateEntities(LevelData* lvl_data, Arena* arena);
 Entity* GetNextAvailableEntity(Entity* entityBuffer, int bufferSize);
