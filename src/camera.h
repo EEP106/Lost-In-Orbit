@@ -7,6 +7,7 @@ struct Camera{
   float camera_y;
 };
 namespace camera {
+void SetScreenSize(float w, float h);
 void GridToWorld(float* x, float* y, const LevelData* lvl);
 void WorldToGrid(float x_world, float y_world, int* x, int* y, const LevelData* lvl);
 bool GetIsPointInsideGrid(float x, float y, const LevelData* lvl);

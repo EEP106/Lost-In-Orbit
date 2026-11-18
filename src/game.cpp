@@ -395,6 +395,9 @@ extern "C" {
       
   void Draw(GameData* data, SDL_Renderer* renderer){
     DEV::PreDraw(data->imGui_context);
+    int w, h;
+    SDL_GetCurrentRenderOutputSize(renderer, &w, &h);
+    camera::SetScreenSize((float)w, (float)h);
     SDL_SetRenderDrawColor(renderer, 120, 70, 120, 255);
     SDL_RenderClear(renderer);
 
@@ -405,13 +408,13 @@ extern "C" {
     case Transition::FadeTo: {
         DrawScene(data, data->scene_previous, renderer);
         float alpha = data->transition.fade_time_elapsed / data->transition.fade_time_duration;
-        RenderSprite_World(GetSprite(SPRITE_ID::black_1x1, data->spriteBuffer), renderer, &data->camera, 0, 0, SCREEN_WIDTH,alpha);
+        RenderSprite_World(GetSprite(SPRITE_ID::black_1x1, data->spriteBuffer), renderer, &data->camera, 0, 0, w,alpha);
       break;
       }
     case Transition::FadeFrom:{
         DrawScene(data, data->scene_current, renderer);
         float alpha = 1 - data->transition.fade_time_elapsed / data->transition.fade_time_duration;
-        RenderSprite_World(GetSprite(SPRITE_ID::black_1x1, data->spriteBuffer), renderer, &data->camera, 0, 0, SCREEN_WIDTH,alpha);
+        RenderSprite_World(GetSprite(SPRITE_ID::black_1x1, data->spriteBuffer), renderer, &data->camera, 0, 0, w,alpha);
       break;
       }
     }
