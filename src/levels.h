@@ -22,6 +22,7 @@ struct LevelData{
   Entity* entityBuffer;
   int entityCount;
   const Tileset* tileset;
+  uint16_t* overlay_cells;
 };
 
 

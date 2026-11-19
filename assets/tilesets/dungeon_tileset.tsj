@@ -1,11 +1,11 @@
-{ "columns":4,
+{ "columns":9,
  "image":"..\/sprites\/hell_of_a_time_dungeon_tileset.png",
- "imageheight":512,
- "imagewidth":2048,
+ "imageheight":4608,
+ "imagewidth":4608,
  "margin":0,
  "name":"dungeon_tileset",
  "spacing":0,
- "tilecount":4,
+ "tilecount":81,
  "tiledversion":"1.12.2",
  "tileheight":512,
  "tiles":[
@@ -29,6 +29,69 @@
         }, 
         {
          "id":2,
+         "properties":[
+                {
+                 "name":"walkable",
+                 "type":"bool",
+                 "value":false
+                }]
+        }, 
+        {
+         "id":3,
+         "properties":[
+                {
+                 "name":"walkable",
+                 "type":"bool",
+                 "value":false
+                }]
+        }, 
+        {
+         "id":4,
+         "properties":[
+                {
+                 "name":"walkable",
+                 "type":"bool",
+                 "value":false
+                }]
+        }, 
+        {
+         "id":5,
+         "properties":[
+                {
+                 "name":"walkable",
+                 "type":"bool",
+                 "value":false
+                }]
+        }, 
+        {
+         "id":6,
+         "properties":[
+                {
+                 "name":"walkable",
+                 "type":"bool",
+                 "value":false
+                }]
+        }, 
+        {
+         "id":7,
+         "properties":[
+                {
+                 "name":"walkable",
+                 "type":"bool",
+                 "value":false
+                }]
+        }, 
+        {
+         "id":8,
+         "properties":[
+                {
+                 "name":"walkable",
+                 "type":"bool",
+                 "value":false
+                }]
+        }, 
+        {
+         "id":9,
          "properties":[
                 {
                  "name":"walkable",

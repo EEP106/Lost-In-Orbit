@@ -16,11 +16,11 @@ void CreateLevel(Arena* arena, LevelData* level, Tileset* tileset, const char* l
   
   bool found = false;
   vector<uint16_t> levelData = AssetManagement::GetCellDataFromJsonLayer(result, "level", &found); 
-
+  
   assert(found);
   int first_non_zero_id = AssetManagement::GetFirstNonZeroCell(&levelData);
   int id_offset = Get_Tileset_ID_Offset_From_Tilemap(first_non_zero_id, result);
-    level->w = result["width"].get<int>();
+  level->w = result["width"].get<int>();
   level->h = result["height"].get<int>();
   level->level_path = level_name;
   level->tileset = tileset;
@@ -32,7 +32,7 @@ void CreateLevel(Arena* arena, LevelData* level, Tileset* tileset, const char* l
     }
     level->cells[i] = local_id;
   }
-
+  
   vector<uint16_t> onLevel = AssetManagement::GetCellDataFromJsonLayer(result, "on_level", &found);
   if(found){
     int firstNonZero = AssetManagement::GetFirstNonZeroCell(&onLevel);
@@ -43,6 +43,15 @@ void CreateLevel(Arena* arena, LevelData* level, Tileset* tileset, const char* l
       int local_id = onLevel[i] - id_offset + 1;
       if(local_id > 0){
         level->goalCount++;
+      }
+      
+      level->overlay_cells = nullptr;
+      vector<uint16_t> overlay = AssetManagement::GetCellDataFromJsonLayer(result, "level_overlay", &found);
+      if(found){
+        level->overlay_cells = ALLOC_ARRAY(arena, uint16_t, level->w * level->h);
+        for (int i = 0; i < level->w * level->h; i++) {
+          level->overlay_cells[i] = overlay[i] == 0 ? 0 : GetLocalTileID(overlay[i], result) + 1;
+        }
       }
     }
     
@@ -72,14 +81,14 @@ void CreateEntities(LevelData* lvl_data, Arena* arena){
   
   fstream stream(lvl_data->level_path);
   auto result = json::parse(stream);
-
+  
   bool found = false;
   vector<uint16_t> entities = AssetManagement::GetCellDataFromJsonLayer(result, "entities", &found);
   
   if(!found){
     return;
   }
-    
+  
   for (int i = 0; i < lvl_data->w * lvl_data->h; i++) {
     if(entities[i] == 0){
       continue;
@@ -98,7 +107,7 @@ Entity* GetNextAvailableEntity(LevelData* level) {
       return &level->entityBuffer[i];
     }
   }
-
+  
   return &level->entityBuffer[level->entityCount++];
 }
 
@@ -108,7 +117,7 @@ void AddEntity(ENTITY_ID entity_id, int x, int y, LevelData *level){
   if(entity == nullptr){
     entity = GetNextAvailableEntity(level);
   }
-
+  
   entity->active = true;
   entity->x = x;
   entity->y = y;
@@ -129,13 +138,20 @@ void RemoveEntity(int x, int y, LevelData* level){
 
 
 bool IsWalkable(int x, int y, LevelData* level){
-  uint16_t id = GetCellID(level, x, y);  
-  return level->tileset->walkableBuffer[id];
+  if(x < 0 || y < 0 || x >= level->w || y >= level->h) return false;
+  int i = y * level->w + x;
+
+  if(!level->tileset->walkableBuffer[level->cells[i]]) return false;
+
+  if(level->overlay_cells != nullptr && level->overlay_cells[i] != 0){
+    if(!level->tileset->walkableBuffer[level->overlay_cells[i] - 1]) return false;   // stored as id + 1
+  }
+  return true;
 }
 
- uint16_t GetCellID(LevelData* level, int x, int y){
-    return level->cells[y * level->w + x];
-  }
+uint16_t GetCellID(LevelData* level, int x, int y){
+  return level->cells[y * level->w + x];
+}
 
 Entity* GetEntity(LevelData* level, int x, int y){
   for (int i = 0; i < level->entityCount; i++) {
@@ -143,68 +159,68 @@ Entity* GetEntity(LevelData* level, int x, int y){
       return &level->entityBuffer[i];
     }
   }
-
+  
   return nullptr; 
 }
 
 Entity* RaycastFirstEntity(int x_origin, int y_origin, Direction direction, LevelData* level, bool ignore_walls){
   Position facingVector;
   switch (direction) {
-  case Direction::RIGHT:
-      facingVector = {1, 0};
-      break;
-  case Direction::LEFT:
-      facingVector = {-1, 0};
-      break;
-  case Direction::UP:
-      facingVector = {0, 1};
-      break;
-  case Direction::DOWN:
-      facingVector = {0, -1};
-      break;
+    case Direction::RIGHT:
+    facingVector = {1, 0};
+    break;
+    case Direction::LEFT:
+    facingVector = {-1, 0};
+    break;
+    case Direction::UP:
+    facingVector = {0, 1};
+    break;
+    case Direction::DOWN:
+    facingVector = {0, -1};
+    break;
   }
-
+  
   int x_search = x_origin + facingVector.x;
   int y_search = y_origin + facingVector.y;
-
+  
   while(x_search > 0 && x_search < level->w && y_search > 0 && y_search < level->h){
-      if(!ignore_walls && !IsWalkable(x_search, y_search, level)){
-        break;
-      }
-
-      Entity* entity_search = GetEntity(level, x_search, y_search);
-      if(entity_search != nullptr){
-        return entity_search;
-      }
-
-      x_search += facingVector.x;
-      y_search += facingVector.y;
+    if(!ignore_walls && !IsWalkable(x_search, y_search, level)){
+      break;
+    }
+    
+    Entity* entity_search = GetEntity(level, x_search, y_search);
+    if(entity_search != nullptr){
+      return entity_search;
+    }
+    
+    x_search += facingVector.x;
+    y_search += facingVector.y;
   }
-
+  
   return nullptr;
 }
 
 namespace AssetManagement{
- std::vector<uint16_t> GetCellDataFromJsonLayer(nlohmann::json& parsedJson, const char* layerName, bool* wasFound){
-   std::vector<uint16_t> result;
-   *wasFound = false;
-   for (const auto& layer : parsedJson["layers"]) {
-        if (layer["name"] == layerName) {
-            result = layer["data"].get<vector<uint16_t>>();
-            *wasFound = true;
-            break;
-        }
+  std::vector<uint16_t> GetCellDataFromJsonLayer(nlohmann::json& parsedJson, const char* layerName, bool* wasFound){
+    std::vector<uint16_t> result;
+    *wasFound = false;
+    for (const auto& layer : parsedJson["layers"]) {
+      if (layer["name"] == layerName) {
+        result = layer["data"].get<vector<uint16_t>>();
+        *wasFound = true;
+        break;
+      }
     }   
     return result;
   }
-
+  
   int GetFirstNonZeroCell(std::vector<uint16_t> *list){
     for (int id : *list) {
       if(id != 0){
         return id;
       }
     } 
-      assert(false);
-      return -1;
+    assert(false);
+    return -1;
   }
 }
