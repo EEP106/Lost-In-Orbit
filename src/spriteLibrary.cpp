@@ -13,17 +13,17 @@ const char* FALLBACK_PATH = "assets/sprites/fallback.png";
 
 static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Fallback, FALLBACK_PATH,8,8},
-  {SPRITE_ID::Rock, "assets/sprites/rock.png", 10, 18},
+  {SPRITE_ID::Rock, "assets/sprites/rock.png", 256, 412},
   {SPRITE_ID::Medusa_Rotate, "assets/sprites/medusa_rotate.png", 12, 24, 8, 1},
-{
-  .id = SPRITE_ID::Medusa_Idle_Left,
-  .path = "assets/sprites/medusa_idle_left.png",
-  .pivot_x = 12,
-  .pivot_y = 24,
-  .tileset_cell_count_x = 4,
-  .tileset_cell_count_y = 1,
-  .framerate = 8
-},
+  {
+    .id = SPRITE_ID::Medusa_Idle_Left,
+    .path = "assets/sprites/medusa_idle_left.png",
+    .pivot_x = 12,
+    .pivot_y = 24,
+    .tileset_cell_count_x = 4,
+    .tileset_cell_count_y = 1,
+    .framerate = 8
+  },
   {SPRITE_ID::Medusa_Idle_Front, "assets/sprites/medusa_idle_front.png", 12, 24, 4, 1, 8},
   {SPRITE_ID::Medusa_Idle_Back, "assets/sprites/medusa_idle_back.png", 12, 24, 4, 1, 8},
   {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 8, 8},
@@ -31,7 +31,7 @@ static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::titlescreen_background, "assets/sprites/titlescreen.png"},
   {SPRITE_ID::space_test_backround, "assets/sprites/space_test_backround.png"},
   {SPRITE_ID::selection_marker, "assets/sprites/selection_marker.png",9,9},
-  {SPRITE_ID::dungeon_tileset, "assets/sprites/hell_of_a_time_dungeon_tileset.png",0,0, 9, 9},
+  {.id = SPRITE_ID::dungeon_tileset, .path = "assets/sprites/hell_of_a_time_dungeon_tileset.png", .pivot_x = 0, .pivot_y = 0, .cell_width = 512, .cell_height = 512},
   {SPRITE_ID::Goal, "assets/sprites/goal.png",8, 8, 8, 1},
   {SPRITE_ID::Menu_Horizon, "assets/sprites/mainmenu_background.png"},
   {SPRITE_ID::Menu_Cloud_Back, "assets/sprites/mainmenu_cloud_back.png"},
@@ -39,44 +39,44 @@ static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Menu_Middle, "assets/sprites/mainmenu_middle.png"},
   {SPRITE_ID::Menu_Front, "assets/sprites/mainmenu_front.png"},
   {SPRITE_ID::Button_Basic, "assets/sprites/basic_button.png",0,0,3,3},
-  };
+};
 
 SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer, const uint64_t* ticks_total){  
   if(entity->id == ENTITY_ID::PLAYER && entity->action == Actions::ROTATING){
     Sprite* spritesheet = GetSprite(SPRITE_ID::Medusa_Rotate, spritebuffer);
-     
+    
     int start = 0;
     int end = 0;
     switch(entity->facing_previous){
-    case Direction::RIGHT:
+      case Direction::RIGHT:
       start = 6;
       break;
-    case Direction::LEFT:
+      case Direction::LEFT:
       start = 2;
       break;
-    case Direction::UP:
+      case Direction::UP:
       start = 4;
       break;
-    case Direction::DOWN:
+      case Direction::DOWN:
       start = 0;
       break;
     }
-
+    
     switch(entity->facing_current){
-    case Direction::RIGHT:
+      case Direction::RIGHT:
       end = 6;
       break;
-    case Direction::LEFT:
+      case Direction::LEFT:
       end = 2;
       break;
-    case Direction::UP:
+      case Direction::UP:
       end = 4;
       break;
-    case Direction::DOWN:
+      case Direction::DOWN:
       end = 0;
       break;
     }
-
+    
     int sprite_count = GetSpriteCount(spritesheet);
     int forward = ((end - start) % sprite_count + sprite_count) % sprite_count;
     int backward = sprite_count - forward;
@@ -84,33 +84,33 @@ SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer,
     int current_frame = (((int)lerp(start, end, entity->progress_01) + sprite_count) % sprite_count);
     return {current_frame, spritesheet};
   }
-
+  
   switch (entity->id) {
-  case ENTITY_ID::PLAYER:{
-  Sprite* sprite = nullptr;
-  int frame = 0;
-    switch (entity->facing_current) {
-      case Direction::RIGHT:
+    case ENTITY_ID::PLAYER:{
+      Sprite* sprite = nullptr;
+      int frame = 0;
+      switch (entity->facing_current) {
+        case Direction::RIGHT:
         sprite = GetSprite(SPRITE_ID::Medusa_Idle_Left, spritebuffer);
         frame = (int)((*ticks_total * sprite->framerate) / FPS % GetSpriteCount(sprite));
         return {frame, sprite, true};
-      case Direction::LEFT:
+        case Direction::LEFT:
         sprite = GetSprite(SPRITE_ID::Medusa_Idle_Left, spritebuffer);
         frame = (int)((*ticks_total * sprite->framerate) / FPS % GetSpriteCount(sprite));
         return {frame, sprite};
-      case Direction::DOWN:
+        case Direction::DOWN:
         sprite = GetSprite(SPRITE_ID::Medusa_Idle_Back, spritebuffer);
         frame = (int)((*ticks_total * sprite->framerate) / FPS % GetSpriteCount(sprite));
         return {frame, sprite};
-      case Direction::UP:
+        case Direction::UP:
         sprite = GetSprite(SPRITE_ID::Medusa_Idle_Front, spritebuffer);
         frame = (int)((*ticks_total * sprite->framerate) / FPS % GetSpriteCount(sprite));
         return {frame, sprite};
       }
-  }
-  case ENTITY_ID::ROCK:
+    }
+    case ENTITY_ID::ROCK:
     return GetSprite(SPRITE_ID::Rock, spritebuffer);
-  default:
+    default:
     return GetSprite(SPRITE_ID::Fallback, spritebuffer);
   }  
 }
@@ -127,19 +127,19 @@ Sprite* GetSprite(SPRITE_ID sprite_id, Sprite* spriteBuffer){
 Sprite* GetSpriteFromID(ENTITY_ID id, Sprite* spriteBuffer){
   Sprite* sprite_to_return = nullptr;
   
- switch (id) {
- case ENTITY_ID::ROCK:
-   sprite_to_return = &spriteBuffer[(int)SPRITE_ID::Rock];
-   break;
- case ENTITY_ID::PLAYER:
-   sprite_to_return = nullptr;
-   break;
+  switch (id) {
+    case ENTITY_ID::ROCK:
+    sprite_to_return = &spriteBuffer[(int)SPRITE_ID::Rock];
+    break;
+    case ENTITY_ID::PLAYER:
+    sprite_to_return = nullptr;
+    break;
   }
-
+  
   if(sprite_to_return == nullptr || sprite_to_return->texture == nullptr){
     sprite_to_return = &spriteBuffer[(int)SPRITE_ID::Fallback];
   }
-
+  
   return sprite_to_return;
 }
 
@@ -151,7 +151,7 @@ namespace AssetManagement{
       LoadSprite(spriteBuffer, entry, renderer);
     }
   }
-
+  
   void LoadSprite(Sprite* spriteBuffer, SpriteDataEntry entry, SDL_Renderer* renderer){
     SDL_Surface* surface = IMG_Load(entry.path); 
     if(surface == nullptr){
@@ -171,10 +171,18 @@ namespace AssetManagement{
       sprite->pivot_x = entry.pivot_x;
       sprite->pivot_y = entry.pivot_y;
     }
-
-    sprite->sprite_count_x = entry.tileset_cell_count_x;
-    sprite->sprite_count_y = entry.tileset_cell_count_y;
+    
+    if(entry.cell_width != NOT_SET && entry.cell_height != NOT_SET){
+      sprite->sprite_count_x = sprite->width  / entry.cell_width;
+      sprite->sprite_count_y = sprite->height / entry.cell_height;
+    }
+    else{
+      sprite->sprite_count_x = entry.tileset_cell_count_x;
+      sprite->sprite_count_y = entry.tileset_cell_count_y;
+    }
     sprite->framerate = entry.framerate;
+    float cell_w = sprite->sprite_count_x > 0 ? (float)sprite->width / sprite->sprite_count_x : (float)sprite->width;
+    sprite->pixels_per_tile = entry.pixels_per_tile > 0 ? entry.pixels_per_tile : cell_w;
     
     SDL_DestroySurface(surface);
   }

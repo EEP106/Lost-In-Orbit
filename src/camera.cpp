@@ -26,8 +26,8 @@ bool camera::GetIsPointInsideGrid(float x, float y, const LevelData* lvl){
 }
 
 void camera::GridToWorld(float* x, float* y, const LevelData* lvl){
-  *x = *x * TILE_SIZE_PX_SCALED + TILE_SIZE_PX_SCALED + OriginX(lvl);
-  *y = *y * TILE_SIZE_PX_SCALED + TILE_SIZE_PX_SCALED + OriginY(lvl);
+  *x = *x * TILE_SIZE_PX_SCALED + OriginX(lvl);
+  *y = *y * TILE_SIZE_PX_SCALED + OriginY(lvl);
 }
 
 void camera::WorldToGrid(float x_world, float y_world, int* x, int* y, const LevelData* lvl){
