@@ -11,6 +11,8 @@ using namespace std;
 
 const char* FALLBACK_PATH = "assets/sprites/fallback.png";
 
+// X axis is negative ofset, so if you want to move the sprite to the left make the first number after the sprite folder path higher (tack Max)
+
 static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Fallback, FALLBACK_PATH,8,8},
   {SPRITE_ID::Rock, "assets/sprites/rock.png", 256, 412},
@@ -26,7 +28,7 @@ static const SpriteDataEntry all_sprite_data[] = {
   },
   {SPRITE_ID::Medusa_Idle_Front, "assets/sprites/medusa_idle_front.png", 12, 24, 4, 1, 8},
   {SPRITE_ID::Medusa_Idle_Back, "assets/sprites/medusa_idle_back.png", 12, 24, 4, 1, 8},
-  {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 8, 8},
+  {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 256, 256},
   {SPRITE_ID::black_1x1, "assets/sprites/1x1_black.png",0,0},
   {SPRITE_ID::titlescreen_background, "assets/sprites/titlescreen.png"},
   {SPRITE_ID::space_test_backround, "assets/sprites/space_test_backround.png"},
@@ -39,6 +41,7 @@ static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Menu_Middle, "assets/sprites/mainmenu_middle.png"},
   {SPRITE_ID::Menu_Front, "assets/sprites/mainmenu_front.png"},
   {SPRITE_ID::Button_Basic, "assets/sprites/basic_button.png",0,0,3,3},
+  {SPRITE_ID::test_entity, "assets/sprites/test_entity.png",210,880},
 };
 
 SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer, const uint64_t* ticks_total){  
@@ -110,6 +113,8 @@ SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer,
     }
     case ENTITY_ID::ROCK:
     return GetSprite(SPRITE_ID::Rock, spritebuffer);
+    case ENTITY_ID::TEST_ENTITY:
+    return GetSprite(SPRITE_ID::test_entity, spritebuffer);
     default:
     return GetSprite(SPRITE_ID::Fallback, spritebuffer);
   }  
@@ -130,6 +135,9 @@ Sprite* GetSpriteFromID(ENTITY_ID id, Sprite* spriteBuffer){
   switch (id) {
     case ENTITY_ID::ROCK:
     sprite_to_return = &spriteBuffer[(int)SPRITE_ID::Rock];
+    break;
+    case ENTITY_ID::TEST_ENTITY:
+    sprite_to_return = &spriteBuffer[(int)SPRITE_ID::test_entity];
     break;
     case ENTITY_ID::PLAYER:
     sprite_to_return = nullptr;

@@ -8,16 +8,16 @@
  "margin":0,
  "name":"Entities",
  "spacing":0,
- "tilecount":3,
- "tiledversion":"1.12.1",
- "tileheight":16,
+ "tilecount":4,
+ "tiledversion":"1.12.2",
+ "tileheight":887,
  "tiles":[
         {
          "height":16,
          "id":0,
          "image":"..\/sprites\/medusa_idle_front.png",
          "imageheight":24,
-         "imagewidth":24,
+         "imagewidth":96,
          "properties":[
                 {
                  "name":"entity_name",
@@ -44,8 +44,8 @@
          "height":16,
          "id":2,
          "image":"..\/sprites\/rock.png",
-         "imageheight":20,
-         "imagewidth":20,
+         "imageheight":512,
+         "imagewidth":512,
          "properties":[
                 {
                  "name":"entity_name",
@@ -55,8 +55,20 @@
          "width":16,
          "x":2,
          "y":3
+        }, 
+        {
+         "id":3,
+         "image":"..\/sprites\/test_entity.png",
+         "imageheight":887,
+         "imagewidth":423,
+         "properties":[
+                {
+                 "name":"entity_name",
+                 "type":"string",
+                 "value":"test_entity"
+                }]
         }],
- "tilewidth":16,
+ "tilewidth":423,
  "type":"tileset",
  "version":"1.10"
 }
