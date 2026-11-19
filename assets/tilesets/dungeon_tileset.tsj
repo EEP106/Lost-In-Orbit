@@ -1,11 +1,11 @@
-{ "columns":4,
+{ "columns":6,
  "image":"..\/sprites\/hell_of_a_time_dungeon_tileset.png",
  "imageheight":512,
- "imagewidth":2048,
+ "imagewidth":3072,
  "margin":0,
  "name":"dungeon_tileset",
  "spacing":0,
- "tilecount":4,
+ "tilecount":6,
  "tiledversion":"1.12.2",
  "tileheight":512,
  "tiles":[
@@ -34,6 +34,34 @@
                  "name":"walkable",
                  "type":"bool",
                  "value":false
+                }]
+        }, 
+        {
+         "id":4,
+         "properties":[
+                {
+                 "name":"toxicFilled",
+                 "type":"bool",
+                 "value":true
+                }, 
+                {
+                 "name":"walkable",
+                 "type":"bool",
+                 "value":true
+                }]
+        }, 
+        {
+         "id":5,
+         "properties":[
+                {
+                 "name":"toxic",
+                 "type":"bool",
+                 "value":true
+                }, 
+                {
+                 "name":"walkable",
+                 "type":"bool",
+                 "value":true
                 }]
         }],
  "tilewidth":512,
