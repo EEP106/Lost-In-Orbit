@@ -17,6 +17,9 @@ struct Tileset{
   TILESETS type;
   bool* walkableBuffer;
   bool* toxicBuffer;
+  bool* toxicFilledBuffer;
+
+  uint16_t toxicFilledTile;
 };
 
 struct TilesetDataEntry{

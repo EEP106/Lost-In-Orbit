@@ -363,7 +363,8 @@ extern "C" {
         AddBehaviour(mover, Behaviour::IS_PUSHING);
         Push(commandBuffer, mv, level);
         if (IsToxic(stepInto_entity->x, stepInto_entity->y, level)) {
-          printf("Rock reached acid");
+          // Ändra tileId från 76 till 77
+          level->cells[stepInto_entity->y * level->w + stepInto_entity->x] = level->tileset->toxicFilledTile;
           RemoveEntity(stepInto_entity->x, stepInto_entity->y, level);
         }
         return true;

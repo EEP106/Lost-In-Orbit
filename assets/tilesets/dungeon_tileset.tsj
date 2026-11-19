@@ -711,6 +711,11 @@
          "id":77,
          "properties":[
                 {
+                 "name":"toxicFilled",
+                 "type":"bool",
+                 "value":true
+                }, 
+                {
                  "name":"walkable",
                  "type":"bool",
                  "value":true
