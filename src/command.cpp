@@ -126,7 +126,8 @@ void Undo(CommandBuffer* cmdBuffer, LevelData* level){
           RemoveCommand* remove = &cmd.remove;
           AddEntity(remove->storedID, remove->x, remove->y, level);
           Entity* entity = GetEntity(level, remove->x, remove->y);
-          SetBehaviour(entity, remove->storedBehaviour); 
+          SetBehaviour(entity, remove->storedBehaviour);
+          level->cells[remove->y * level->w + remove->x] = remove->tileOld;
           break;            
         }
       case CMD_TYPE::SWAP_ACTIVE:{

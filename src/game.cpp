@@ -371,9 +371,12 @@ extern "C" {
         AddBehaviour(mover, Behaviour::IS_PUSHING);
         Push(commandBuffer, mv, level);
         if (IsToxic(stepInto_entity->x, stepInto_entity->y, level)) {
-          // Ändra tileId från 76 till 77
+          // Sparar toxic till tileOld
+          uint16_t oldTile = GetCellID(level, stepInto_entity->x, stepInto_entity->y);
+          RemoveCommand remove(stepInto_entity , oldTile);
+          // Ändra tileId från 5 till 4
           level->cells[stepInto_entity->y * level->w + stepInto_entity->x] = level->tileset->toxicFilledTile;
-          RemoveEntity(stepInto_entity->x, stepInto_entity->y, level);
+          Push(commandBuffer, remove, level);
         }
         return true;
       }

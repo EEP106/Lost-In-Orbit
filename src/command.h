@@ -9,7 +9,8 @@ enum class CMD_TYPE : uint8_t{
   MODIFY_BEHAVIOUR = 3,
   ADD = 4,
   REMOVE = 5,
-  SWAP_ACTIVE = 6
+  SWAP_ACTIVE = 6,
+  TILE_CHANGE = 7
 };
 
 struct Command {
@@ -34,12 +35,22 @@ struct SwapActiveEntityCommand : Command {
 struct RemoveCommand : Command{
   int x;
   int y;
+  uint16_t tileOld;
   Behaviour storedBehaviour;
   ENTITY_ID storedID;
 
-  RemoveCommand(Entity* entity){
+  RemoveCommand(Entity* entity) {
     x = entity->x;
     y = entity->y;
+    tileOld = 0;
+    storedBehaviour = entity->behaviour;
+    storedID = entity->id;
+    type = CMD_TYPE::REMOVE;
+  }
+  RemoveCommand(Entity* entity, uint16_t tileOld){
+    x = entity->x;
+    y = entity->y;
+    this->tileOld = tileOld;
     storedBehaviour = entity->behaviour;
     storedID = entity->id;
     type = CMD_TYPE::REMOVE;
@@ -102,6 +113,22 @@ struct MoveCommand : Command {
   }
 };
 
+struct TileChangeCommand : Command {
+  int x;
+  int y;
+
+  uint16_t tileOld;
+  uint16_t tileNew;
+
+  TileChangeCommand(int x, int y, uint16_t tileOld, uint16_t tileNew) {
+    this->x = x;
+    this->y = y;
+    this->tileOld = tileOld;
+    this->tileNew = tileNew;
+    type = CMD_TYPE::TILE_CHANGE;
+  }
+};
+
 union AnyCommand {
   Command command;
   MoveCommand move;
@@ -110,6 +137,7 @@ union AnyCommand {
   AddCommand add;
   RemoveCommand remove;
   SwapActiveEntityCommand swap_active;
+  TileChangeCommand tile_change;
   
   AnyCommand(MoveCommand mov){
     move = mov;
