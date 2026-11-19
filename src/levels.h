@@ -16,6 +16,7 @@ struct LevelData{
   int w;
   int h;
   uint16_t* cells;
+  uint16_t* startingCells;
   Goal* goals;
   int goalCount; 
   const char* level_path;

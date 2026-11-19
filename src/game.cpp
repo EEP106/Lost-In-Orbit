@@ -55,6 +55,11 @@ extern "C" {
     Reset(arena_commands);    
     CreateEntities(&gameplay->levels[gameplay->currentLevelIndex], arena_entities);
     gameplay->activePlayerIndex = 0;
+    // Used to find the current level to reset. TODO: Fixa en function för denna del
+    LevelData* currentLevel = &gameplay->levels[gameplay->currentLevelIndex];
+    for (int i = 0; i < currentLevel->w * currentLevel->h; i++) {
+      currentLevel->cells[i] = currentLevel->startingCells[i];
+    }
   }
     
   void ChangeScene(GameData* data, SCENE_TYPES new_scene){

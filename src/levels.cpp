@@ -25,12 +25,14 @@ void CreateLevel(Arena* arena, LevelData* level, Tileset* tileset, const char* l
   level->level_path = level_name;
   level->tileset = tileset;
   level->cells = ALLOC_ARRAY(arena, uint16_t, level->w * level->h);
+  level->startingCells = ALLOC_ARRAY(arena, uint16_t, level->w * level->h);
   for (int i = 0; i < level->w * level->h; i++) {
     int local_id = levelData[i] - id_offset;
     if(local_id < 0){
       local_id = 0;
     }
     level->cells[i] = local_id;
+    level->startingCells[i] = local_id;
   }
 
   vector<uint16_t> onLevel = AssetManagement::GetCellDataFromJsonLayer(result, "on_level", &found);
