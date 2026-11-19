@@ -46,7 +46,7 @@ void RenderSprite_World(SpriteRenderInfo spriteRenderInfo, SDL_Renderer* rendere
   }
 
   
-  SDL_SetTextureScaleMode(sprite->texture, SDL_SCALEMODE_PIXELART);
+  SDL_SetTextureScaleMode(sprite->texture, final_scale < 1.0f ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_PIXELART);
   SDL_SetTextureAlphaModFloat(sprite->texture, alpha);
   SDL_FlipMode flip = (flipped || spriteRenderInfo.flipped_x) ? SDL_FlipMode::SDL_FLIP_HORIZONTAL : SDL_FlipMode::SDL_FLIP_NONE;
   SDL_RenderTextureRotated(renderer, sprite->texture, &tilesetRect, &rect, 0, 0, flip);
@@ -57,15 +57,18 @@ static float g_tile_fit = 1.0f;
 void RenderTile(Sprite* tileset, int cell_id, LevelData* level, SDL_Renderer* renderer, const Camera* camera, float x, float y, float scale, float alpha){
   camera::GridToWorld(&x, &y, level);
   float cell_w = (float)tileset->width / tileset->sprite_count_x;
-  g_tile_fit = (float)TILE_SIZE_PX_SCALED / (cell_w * UPSCALE_FACTOR);
-  RenderSprite_World({cell_id, tileset}, renderer, camera, x, y, scale * g_tile_fit, alpha, false);
+  float fit = (float)TILE_SIZE_PX_SCALED / (cell_w * UPSCALE_FACTOR);
+  RenderSprite_World({cell_id, tileset}, renderer, camera, x, y, scale * fit, alpha, false);
 }
+
+constexpr float ENTITY_ART_TILE_PX = 16.0f;   // tile size the entity sprites were drawn for
 
 void RenderSprite_OnTile(SpriteRenderInfo spriteInfo, LevelData* level, SDL_Renderer* renderer, const Camera* camera, float x, float y, float scale, float alpha, bool flipped){
   camera::GridToWorld(&x, &y, level);
   x += TILE_SIZE_PX_SCALED / 2.0;
   y += TILE_SIZE_PX_SCALED / 2.0;
-  RenderSprite_World(spriteInfo, renderer, camera, x, y, scale * g_tile_fit, alpha, flipped);
+  float entity_fit = TILE_SIZE_PX_SCALED / (ENTITY_ART_TILE_PX * UPSCALE_FACTOR);
+  RenderSprite_World(spriteInfo, renderer, camera, x, y, scale * entity_fit, alpha, flipped);
 }
 
 void RenderButton(Button* button, bool is_selected, SDL_Renderer* renderer){
