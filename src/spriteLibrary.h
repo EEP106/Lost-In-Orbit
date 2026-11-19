@@ -83,6 +83,8 @@ struct SpriteDataEntry{
   int tileset_cell_count_x = NOT_SET;
   int tileset_cell_count_y = NOT_SET;
   int framerate = NOT_SET;
+  int cell_width = NOT_SET;
+  int cell_height = NOT_SET;
 };
 
 
