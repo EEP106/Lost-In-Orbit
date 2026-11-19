@@ -40,6 +40,7 @@ inline Direction DirectionFromXY(int xDir, int yDir){
 enum class ENTITY_ID : uint8_t {
   PLAYER = 0,
   ROCK = 2,
+  TEST_ENTITY = 3
 };
 
 struct Position{
