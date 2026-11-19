@@ -21,6 +21,7 @@
 #include "levelRenderer.h"
 #include "tilesetLibrary.h"
 #include <cmath>
+#include <algorithm>
 
 extern "C" {
 
@@ -113,7 +114,17 @@ extern "C" {
       return;
     }
 
-    
+    bool are_entities_acting = false;
+    LevelData *level = GetCurrentLevel(gameplay);
+    Entity* entityBuffer = level->entityBuffer;
+
+    for (int i = 0; i < level->entityCount; i++){
+      if(IsActing(&entityBuffer[i])){
+        are_entities_acting = true;
+        break;
+      }
+    }
+
     float undo_speed_up = std::lerp(1.0, 0.15, (gameplay->commandBuffer->head - gameplay->commandBuffer->index) * (1.0/30.0));
     if(undo_speed_up < 0.15){
       undo_speed_up = 0.15;
@@ -127,8 +138,10 @@ extern "C" {
         Undo(gameplay->commandBuffer, GetCurrentLevel(gameplay));
       }
     }
-   
-    if(KeyPressed(input,SDL_SCANCODE_RIGHT) || KeyHeld_ForTime(input,SDL_SCANCODE_RIGHT, (1 / MOVE_SPEED) * 1.15)){
+    bool can_accept_input =! are_entities_acting && gameplay->input_buffer_read_count == gameplay->input_buffer_write_count;
+    if (can_accept_input)
+    {
+      if(KeyPressed(input,SDL_SCANCODE_RIGHT) || KeyHeld_ForTime(input,SDL_SCANCODE_RIGHT, (1 / MOVE_SPEED) * 1.15)){
       ResetKeyHeldTime(input, SDL_SCANCODE_RIGHT);
       gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {1, 0};
     }
@@ -144,18 +157,8 @@ extern "C" {
       ResetKeyHeldTime(input, SDL_SCANCODE_DOWN);
       gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {0, 1};
     }
-    
-    
-    bool are_entities_acting = false;
-    LevelData *level = GetCurrentLevel(gameplay);
-    Entity* entityBuffer = level->entityBuffer;
-
-    for (int i = 0; i < level->entityCount; i++){
-      if(IsActing(&entityBuffer[i])){
-        are_entities_acting = true;
-        break;
-      }
     }
+
 
     for (int i = 0; i < level->goalCount; i++) {
       Entity* entity = GetEntity(level, level->goals[i].x, level->goals[i].y);
@@ -387,10 +390,15 @@ extern "C" {
       case SCENE_TYPES::MAINMENU:
         DrawMenu(&data->scenes.mainMenu, renderer, data->spriteBuffer, &data->input);
         break;
-      case SCENE_TYPES::GAME:
-        RenderLevel(data, renderer);  
+      case SCENE_TYPES::GAME:{
+        Sprite* bg = GetSprite(SPRITE_ID::space_test_backround, data->spriteBuffer);
+        int w, h;
+        SDL_GetCurrentRenderOutputSize(renderer, &w, &h);
+        float scale = std::max((float)w / bg->width, (float)h / bg->height) / UPSCALE_FACTOR;
+        RenderSprite_World(bg, renderer, nullptr, w / 2.0f, h / 2.0f, scale);
+        RenderLevel(data, renderer);
         RenderEntities(data, renderer);
-        break;
+        break;}
       case SCENE_TYPES::CREDITS:
         break;
       case SCENE_TYPES::NONE:
@@ -401,6 +409,10 @@ extern "C" {
       
   void Draw(GameData* data, SDL_Renderer* renderer){
     DEV::PreDraw(data->imGui_context);
+    int w, h;
+    SDL_GetCurrentRenderOutputSize(renderer, &w, &h);
+    camera::SetScreenSize((float)w, (float)h);
+    data->scenes.mainMenu.SetScreenSize((float)w, (float)h);
     SDL_SetRenderDrawColor(renderer, 120, 70, 120, 255);
     SDL_RenderClear(renderer);
 
@@ -411,13 +423,13 @@ extern "C" {
     case Transition::FadeTo: {
         DrawScene(data, data->scene_previous, renderer);
         float alpha = data->transition.fade_time_elapsed / data->transition.fade_time_duration;
-        RenderSprite_World(GetSprite(SPRITE_ID::black_1x1, data->spriteBuffer), renderer, &data->camera, 0, 0, SCREEN_WIDTH,alpha);
+        RenderSprite_World(GetSprite(SPRITE_ID::black_1x1, data->spriteBuffer), renderer, &data->camera, 0, 0, w,alpha);
       break;
       }
     case Transition::FadeFrom:{
         DrawScene(data, data->scene_current, renderer);
         float alpha = 1 - data->transition.fade_time_elapsed / data->transition.fade_time_duration;
-        RenderSprite_World(GetSprite(SPRITE_ID::black_1x1, data->spriteBuffer), renderer, &data->camera, 0, 0, SCREEN_WIDTH,alpha);
+        RenderSprite_World(GetSprite(SPRITE_ID::black_1x1, data->spriteBuffer), renderer, &data->camera, 0, 0, w,alpha);
       break;
       }
     }

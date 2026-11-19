@@ -9,8 +9,25 @@
 #include "rendering.h"
 #include "spriteLibrary.h"
 #include <cassert>
+#include <algorithm>
 
+static float g_screen_w = SCREEN_WIDTH;
+static float g_screen_h = SCREEN_HEIGHT;
+
+void MainMenu::SetScreenSize(float w, float h){
+  g_screen_w = w;
+  g_screen_h = h;
+}
  
+static void LayoutButtons(MainMenu* mainmenu){
+  static const float offsets_y[] = {0.0f, 200.0f};   // vertical offset from screen center, per button
+  for (int i = 0; i < mainmenu->button_count && i < (int)(sizeof(offsets_y) / sizeof(float)); i++) {
+    Button* button = &mainmenu->buttons[i];
+    button->rect.x = g_screen_w / 2.0f - button->rect.w / 2.0f;
+    button->rect.y = g_screen_h / 2.0f + offsets_y[i] - button->rect.h / 2.0f;
+  }
+}
+
 void InitializeMenu(MainMenu* mainmenu, Sprite* spriteBuffer, FontAtlas* font, Memory::Arena* arena_main){
   assert(mainmenu->initialized == false);
   mainmenu->button_count = 2;
@@ -41,6 +58,7 @@ void InitializeMenu(MainMenu* mainmenu, Sprite* spriteBuffer, FontAtlas* font, M
 
 void UpdateMenu(GameData* data){
   MainMenu* mainmenu = &data->scenes.mainMenu;
+  LayoutButtons(mainmenu);
   Input* input = &data->input;
   mainmenu->activeButtonCount = GetActiveButtonCount(mainmenu->buttons, mainmenu->button_count);
   if(mainmenu->activeButtonCount == 0){
@@ -99,12 +117,15 @@ void UpdateMenu(GameData* data){
 }
 
 void DrawMenu(MainMenu* mainmenu, SDL_Renderer* renderer, Sprite* spriteBuffer, Input* input){
-  float scale = (SCREEN_HEIGHT / ((float)mainmenu->background_horizon->height * UPSCALE_FACTOR));
-  scale *= 1.2;
+  LayoutButtons(mainmenu);
+
+  Sprite* horizon = mainmenu->background_horizon;
+  float scale = std::max(g_screen_w / horizon->width, g_screen_h / horizon->height) / UPSCALE_FACTOR;
+  scale *= 1.2f;
   float mouse_x = input->mouse_x;
   float mouse_y = input->mouse_y;
-  float center_x = SCREEN_WIDTH / 2.0;
-  float center_y = SCREEN_HEIGHT / 2.0;
+  float center_x = g_screen_w / 2.0f;
+  float center_y = g_screen_h / 2.0f;
   float offset_x = center_x - mouse_x;
   float offset_y = center_y - mouse_y;
   RenderSprite_World(GetSprite(SPRITE_ID::Menu_Horizon, spriteBuffer),     renderer, NULL, center_x, center_y, scale);

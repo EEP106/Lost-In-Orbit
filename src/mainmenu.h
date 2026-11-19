@@ -11,6 +11,7 @@ namespace Memory{
 }
 
 struct MainMenu {
+  void SetScreenSize(float w, float h);
   Button* buttons;
   int button_count;
   int activeButtonIndex;

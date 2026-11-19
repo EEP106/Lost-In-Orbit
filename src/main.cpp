@@ -14,6 +14,7 @@
 #include "SDL3/SDL_stdinc.h"
 #include "SDL3/SDL_timer.h"
 #include "SDL3/SDL_log.h"
+#include "SDL3/SDL_video.h"
 #include "SDL_TTF/SDL_ttf.h"
 #include "command.h"
 #include "common.h"
@@ -119,7 +120,7 @@ void SDL_Setup(){
     SDL_SetLogPriorities(SDL_LOG_PRIORITY_VERBOSE);
     TTF_Init();
 
-    window = SDL_CreateWindow("lost in orbit", SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+    window = SDL_CreateWindow("lost in orbit", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
     renderer = SDL_CreateRenderer(window, NULL);
 }
 
@@ -256,8 +257,13 @@ int main() {
                 if(event.key.key == SDLK_F9){
                     StoreGameState(arena_main);
                 }
-               if(event.key.key == SDLK_F10){
+                if(event.key.key == SDLK_F10){
                     RetrieveGameState(arena_main);
+                }
+                // Press F for fullscreen and F again to return to original window size
+                if(event.key.key == SDLK_F && !event.key.repeat){
+                    bool is_fullscreen = (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN) != 0;
+                    SDL_SetWindowFullscreen(window, !is_fullscreen);
                 }
             }
         }
