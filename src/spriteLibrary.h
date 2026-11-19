@@ -37,6 +37,7 @@ struct Sprite{
   int sprite_count_x;
   int sprite_count_y;
   int framerate;
+  float pixels_per_tile;
 };
 
 struct SpriteRenderInfo{
@@ -85,6 +86,7 @@ struct SpriteDataEntry{
   int framerate = NOT_SET;
   int cell_width = NOT_SET;
   int cell_height = NOT_SET;
+  float pixels_per_tile = NOT_SET;
 };
 
 

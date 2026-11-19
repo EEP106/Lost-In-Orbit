@@ -13,7 +13,7 @@ const char* FALLBACK_PATH = "assets/sprites/fallback.png";
 
 static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Fallback, FALLBACK_PATH,8,8},
-  {SPRITE_ID::Rock, "assets/sprites/rock.png", 10, 18},
+  {SPRITE_ID::Rock, "assets/sprites/rock.png", 256, 412},
   {SPRITE_ID::Medusa_Rotate, "assets/sprites/medusa_rotate.png", 12, 24, 8, 1},
   {
     .id = SPRITE_ID::Medusa_Idle_Left,
@@ -181,6 +181,8 @@ namespace AssetManagement{
       sprite->sprite_count_y = entry.tileset_cell_count_y;
     }
     sprite->framerate = entry.framerate;
+    float cell_w = sprite->sprite_count_x > 0 ? (float)sprite->width / sprite->sprite_count_x : (float)sprite->width;
+    sprite->pixels_per_tile = entry.pixels_per_tile > 0 ? entry.pixels_per_tile : cell_w;
     
     SDL_DestroySurface(surface);
   }
