@@ -116,13 +116,14 @@ struct MoveCommand : Command {
 struct TileChangeCommand : Command {
   int x;
   int y;
-
+  
   uint16_t tileOld;
   uint16_t tileNew;
 
   TileChangeCommand(int x, int y, uint16_t tileOld, uint16_t tileNew) {
     this->x = x;
     this->y = y;
+
     this->tileOld = tileOld;
     this->tileNew = tileNew;
     type = CMD_TYPE::TILE_CHANGE;
@@ -156,6 +157,9 @@ union AnyCommand {
   }
   AnyCommand(SwapActiveEntityCommand swa){
     swap_active = swa;
+  }
+  AnyCommand(TileChangeCommand tc) {
+    tile_change = tc;
   }
 };
 

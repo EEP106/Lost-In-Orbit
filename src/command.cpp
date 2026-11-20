@@ -67,6 +67,11 @@ void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* commandBuffer, Fro
       *swap->value_to_change = swap->index_current;
       break;
       }
+    case CMD_TYPE::TILE_CHANGE: {
+      TileChangeCommand* tile = &cmd.tile_change;
+      level->cells[tile->y * level->w + tile->x] = tile->tileNew;
+      break;
+      }
     }
 }
 
@@ -128,14 +133,20 @@ void Undo(CommandBuffer* cmdBuffer, LevelData* level){
           Entity* entity = GetEntity(level, remove->x, remove->y);
           SetBehaviour(entity, remove->storedBehaviour);
           level->cells[remove->y * level->w + remove->x] = remove->tileOld;
-          break;            
+          break;
         }
       case CMD_TYPE::SWAP_ACTIVE:{
           SwapActiveEntityCommand* swap = &cmd.swap_active;
           *swap->value_to_change = swap->index_previous;
           break;
         }
+      case CMD_TYPE::TILE_CHANGE:{
+        TileChangeCommand* tile = &cmd.tile_change;
+        level->cells[tile->y * level->w + tile->x] = tile->tileOld;
+        break;
       }
+
+  }
 
   if(cmdBuffer->index > 0){
     if(cmdBuffer->allCommands[cmdBuffer->index - 1].command.timestamp == timestamp){

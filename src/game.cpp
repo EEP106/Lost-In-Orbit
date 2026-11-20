@@ -375,8 +375,12 @@ extern "C" {
           uint16_t oldTile = GetCellID(level, stepInto_entity->x, stepInto_entity->y);
           RemoveCommand remove(stepInto_entity , oldTile);
           // Ändra tileId från 5 till 4
-          level->cells[stepInto_entity->y * level->w + stepInto_entity->x] = level->tileset->toxicFilledTile;
+          TileChangeCommand tile(stepInto_entity->x,
+            stepInto_entity->y,oldTile,
+            level->tileset->toxicFilledTile);
           Push(commandBuffer, remove, level);
+          Push(commandBuffer,tile , level);
+
         }
         return true;
       }
