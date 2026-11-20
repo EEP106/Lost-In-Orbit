@@ -23,7 +23,9 @@ enum class SPRITE_ID{
   Menu_Middle,
   Menu_Front,
   Button_Basic,
-  test_entity
+  test_entity,
+  Background_Asteroid_1,
+  Background_Asteroid_2
 };
 
 const int NOT_SET = -1;
