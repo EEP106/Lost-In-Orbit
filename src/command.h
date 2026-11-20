@@ -33,6 +33,7 @@ struct SwapActiveEntityCommand : Command {
 };
 
 struct RemoveCommand : Command{
+  Entity* entity;
   int x;
   int y;
   uint16_t tileOld;
@@ -40,6 +41,7 @@ struct RemoveCommand : Command{
   ENTITY_ID storedID;
 
   RemoveCommand(Entity* entity) {
+    this->entity = entity;
     x = entity->x;
     y = entity->y;
     tileOld = 0;
@@ -48,6 +50,7 @@ struct RemoveCommand : Command{
     type = CMD_TYPE::REMOVE;
   }
   RemoveCommand(Entity* entity, uint16_t tileOld){
+    this->entity = entity;
     x = entity->x;
     y = entity->y;
     this->tileOld = tileOld;

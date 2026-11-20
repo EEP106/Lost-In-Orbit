@@ -32,6 +32,7 @@ void CreateLevel(Arena* arena, LevelData* level, Tileset* tileset, const char* l
 void CreateEntities(LevelData* lvl_data, Arena* arena);
 Entity* GetNextAvailableEntity(Entity* entityBuffer, int bufferSize);
 void AddEntity(ENTITY_ID entity_id, int x, int y, LevelData* level);
+void ReAddEntity(Entity* entity,ENTITY_ID entity_id, int x, int y, Behaviour behaviour);
 void RemoveEntity(int x, int y, LevelData* level);
 uint16_t GetCellID(LevelData* level ,int x, int y);
 Entity* GetEntity(LevelData* level, int x, int y);

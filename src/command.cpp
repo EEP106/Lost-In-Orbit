@@ -59,7 +59,9 @@ void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* commandBuffer, Fro
     }
     case CMD_TYPE::REMOVE:{
       RemoveCommand* remove = &cmd.remove;
-      RemoveEntity(remove->x, remove->y, level);
+      if (remove->entity != nullptr) {
+        remove->entity->active = false;
+      }
       break;          
       }
     case CMD_TYPE::SWAP_ACTIVE:{
@@ -71,7 +73,7 @@ void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* commandBuffer, Fro
       TileChangeCommand* tile = &cmd.tile_change;
       level->cells[tile->y * level->w + tile->x] = tile->tileNew;
       break;
-      }
+    }
     }
 }
 
@@ -129,9 +131,9 @@ void Undo(CommandBuffer* cmdBuffer, LevelData* level){
         }
       case CMD_TYPE::REMOVE:{
           RemoveCommand* remove = &cmd.remove;
-          AddEntity(remove->storedID, remove->x, remove->y, level);
           Entity* entity = GetEntity(level, remove->x, remove->y);
           SetBehaviour(entity, remove->storedBehaviour);
+          ReAddEntity(remove->entity, remove->storedID, remove->x, remove->y, remove->storedBehaviour);
           level->cells[remove->y * level->w + remove->x] = remove->tileOld;
           break;
         }
@@ -141,12 +143,11 @@ void Undo(CommandBuffer* cmdBuffer, LevelData* level){
           break;
         }
       case CMD_TYPE::TILE_CHANGE:{
-        TileChangeCommand* tile = &cmd.tile_change;
-        level->cells[tile->y * level->w + tile->x] = tile->tileOld;
-        break;
+          TileChangeCommand* tile = &cmd.tile_change;
+          level->cells[tile->y * level->w + tile->x] = tile->tileOld;
+          break;
+        }
       }
-
-  }
 
   if(cmdBuffer->index > 0){
     if(cmdBuffer->allCommands[cmdBuffer->index - 1].command.timestamp == timestamp){

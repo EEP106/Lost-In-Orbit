@@ -121,6 +121,21 @@ void AddEntity(ENTITY_ID entity_id, int x, int y, LevelData *level){
   InitializeBaseBehaviour(entity);
 }
 
+void ReAddEntity(Entity* entity, ENTITY_ID entity_id, int x, int y, Behaviour behaviour) {
+  if (entity == nullptr) {
+    return;
+  }
+
+  entity->active = true;
+  entity->x = x;
+  entity->y = y;
+  entity->x_prev = x;
+  entity->y_prev = y;
+  entity->id = entity_id;
+  entity->action = Actions::NONE;
+  SetBehaviour(entity, behaviour);
+};
+
 void RemoveEntity(int x, int y, LevelData* level){
   Entity* entity = GetEntity(level, x, y);
   if(entity == nullptr){
