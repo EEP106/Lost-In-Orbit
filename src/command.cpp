@@ -1,6 +1,7 @@
 #include "command.h"
 #include "entity.h"
 #include "levels.h"
+#include <cassert>
 
 enum class FromRedo {No, Yes};
 
@@ -70,13 +71,38 @@ void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* commandBuffer, Fro
     }
 }
 
-void Push(CommandBuffer* buffer, AnyCommand cmd, LevelData* level){
+void Queue(CommandBuffer *buffer, AnyCommand cmd){
   assert(cmd.command.type != CMD_TYPE::NONE);
-  buffer->allCommands[buffer->index] = cmd;
-  buffer->allCommands[buffer->index].command.timestamp = buffer->timestamp;
-  buffer->index++;
+
+  if (buffer->head > buffer->index){
+    buffer->head = buffer->index;
+    buffer->queueHead = buffer->index;
+  }
+  assert(buffer->queueHead < buffer->capacity);
+
+  buffer->allCommands[buffer->queueHead] = cmd;
+  buffer->allCommands[buffer->queueHead].command.timestamp = buffer->timestamp;
+  buffer->queueHead++;
+}
+
+void Push(CommandBuffer* buffer, AnyCommand cmd, LevelData* level){
+  assert(buffer->queueHead == buffer->index); // Trying to push to non flushed queue!
+  
   buffer->head = buffer->index;
+  Queue(buffer, cmd);
   Execute(cmd, level, buffer, FromRedo::No);
+  buffer->index = buffer->queueHead;
+  buffer->head = buffer->queueHead;
+}
+
+void Flush(CommandBuffer* Buffer, LevelData* level){
+  assert(Buffer->index < Buffer->queueHead); // Nothing to flush
+  while(Buffer->index < Buffer->queueHead){
+    AnyCommand command = Buffer->allCommands[Buffer->index];
+    Execute(command, level, Buffer);
+    Buffer->index++;
+  }
+  Buffer->head = Buffer->index;
 }
 
 void Undo(CommandBuffer* cmdBuffer, LevelData* level){
@@ -84,6 +110,7 @@ void Undo(CommandBuffer* cmdBuffer, LevelData* level){
     return;
   }
   cmdBuffer->index--;
+  cmdBuffer->queueHead = cmdBuffer->index;
 
   AnyCommand cmd = cmdBuffer->allCommands[cmdBuffer->index];
   assert(cmd.command.type != CMD_TYPE::NONE);
@@ -153,6 +180,7 @@ void Redo(CommandBuffer* cmdBuffer, LevelData* level){
   Execute(cmd, level, cmdBuffer, FromRedo::Yes);
 
   cmdBuffer->index++;
+  cmdBuffer->queueHead = cmdBuffer->index;
 
   if(cmdBuffer->index != cmdBuffer->head){
     AnyCommand nextCommand = cmdBuffer->allCommands[cmdBuffer->index];
@@ -163,6 +191,7 @@ void Redo(CommandBuffer* cmdBuffer, LevelData* level){
 }
 void ResetCommandBuffer(CommandBuffer* buffer){
   buffer->index = 0;
+  buffer->queueHead = 0;
   buffer->head = 0;
   buffer->timestamp = 0;
 }

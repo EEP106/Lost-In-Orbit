@@ -113,6 +113,37 @@ extern "C" {
   
   void UpdateTitlescreen(TitleScreen* titlescreen, const float dt){
   }
+
+  enum class QueueActionResult {Nothing, Rotate, Move, MoveFailed};
+
+  QueueActionResult QueueAction(Gameplay* gameplay, LevelData* level){
+    Entity* entity = GetActiveEntity(gameplay);
+    
+    if(!HasBehaviour(entity, (Behaviour)(RESPOND_TO_INPUT | CAN_MOVE))){
+      return QueueActionResult::Nothing;
+    }
+    
+    int xDir = gameplay->input_buffer[gameplay->input_buffer_read_count % gameplay->input_buffer_capacity].x;
+    int yDir = gameplay->input_buffer[gameplay->input_buffer_read_count % gameplay->input_buffer_capacity].y;
+    
+    Direction new_facing = DirectionFromXY(xDir, yDir);
+    if(new_facing != entity->facing_current){ 
+      RotateCommand rotate(entity, entity->facing_current, new_facing);
+      Queue(gameplay->commandBuffer, rotate);
+      return QueueActionResult::Rotate;
+    }
+    
+    if(!IsActing(entity)){
+      bool moved = TryMove(entity, level, gameplay->commandBuffer, xDir, yDir, entity->strength);
+      if(moved){
+        PlaySFX(SFX_ID::JUMP);
+        return QueueActionResult::Move;
+      }
+      return QueueActionResult::MoveFailed;
+    }
+
+    return QueueActionResult::Nothing;
+  }
   
   void UpdateGame(Gameplay* gameplay, Input* input, Arena* arena_scratch, Arena* arena_commands, Arena* arena_entities, const float dt){
     
@@ -257,34 +288,23 @@ extern "C" {
     if(gameplay->input_buffer_read_count == gameplay->input_buffer_write_count){
       return;
     }
-    
-    Entity* entity = GetActiveEntity(gameplay);
-    
-    if(!HasBehaviour(entity, (Behaviour)(RESPOND_TO_INPUT | CAN_MOVE))){
-      return;
-    }
-    
-    int xDir = gameplay->input_buffer[gameplay->input_buffer_read_count % gameplay->input_buffer_capacity].x;
-    int yDir = gameplay->input_buffer[gameplay->input_buffer_read_count % gameplay->input_buffer_capacity].y;
-    
-    Direction new_facing = DirectionFromXY(xDir, yDir);
-    if(new_facing != entity->facing_current){ 
-      RotateCommand rotate(entity, entity->facing_current, new_facing);
-      Push(gameplay->commandBuffer, rotate, level);
-      return;
-    }
-    
-    if(!IsActing(entity)){
-      bool moved = TryMove(entity, level, gameplay->commandBuffer, xDir, yDir, entity->strength);
-      if(moved){
-        PlaySFX(SFX_ID::JUMP);
-      }
-      gameplay->commandBuffer->timestamp += 1;
-      gameplay->input_buffer_read_count++;
+
+    QueueActionResult result = QueueAction(gameplay, level);
+
+    switch (result) {
+      case QueueActionResult::Nothing:
+        break;
+      case QueueActionResult::Rotate:
+        Flush(gameplay->commandBuffer, level);
+        break;
+      case QueueActionResult::Move:
+        Flush(gameplay->commandBuffer, level);
+        gameplay->commandBuffer->timestamp++;
+      case QueueActionResult::MoveFailed:
+        gameplay->input_buffer_read_count++;
+        break;
     }
   }  
-  
-  
   
   void Update(GameData* data,float dt){
     *data->ticks_total += 1;
@@ -364,7 +384,7 @@ extern "C" {
     if(stepInto_entity == nullptr){
       if(IsWalkable(test_x, test_y, level)){
         MoveCommand mv(mover, xDir, yDir);
-        Push(commandBuffer, mv, level);
+        Queue(commandBuffer, mv);
         return true;
       }
       return false;
@@ -374,7 +394,7 @@ extern "C" {
       if(TryMove(stepInto_entity, level,commandBuffer, xDir, yDir, --strength)){
         MoveCommand mv(mover, xDir, yDir);
         AddBehaviour(mover, Behaviour::IS_PUSHING);
-        Push(commandBuffer, mv, level);
+        Queue(commandBuffer, mv);
         return true;
       }
     }
