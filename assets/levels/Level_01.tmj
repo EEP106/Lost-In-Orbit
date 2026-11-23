@@ -135,10 +135,6 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"..\/..\/..\/..\/..\/Users\/Johan\/Desktop\/tilesets\/tilesetSakkoban.tsj"
-        }, 
-        {
-         "firstgid":1,
          "source":"..\/tilesets\/Entities.tsj"
         }, 
         {

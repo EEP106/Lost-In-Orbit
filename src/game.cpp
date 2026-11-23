@@ -36,6 +36,7 @@ extern "C" {
   }
   
   void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer){
+    data->editor_data.editor.object_to_place_id = ENTITY_ID::ROCK;
     *data->ticks_total = 0;
     DEV::Initialize(window, renderer);
     InitializeAudioSystem(&data->audio, data->arena_main);

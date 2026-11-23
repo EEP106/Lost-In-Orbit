@@ -28,16 +28,26 @@ namespace EDITOR {
   }
 
   void DrawPreview(Editor* editor, Input* input, SDL_Renderer* renderer, LevelData* level, Camera* camera, Sprite* spriteBuffer){
+    if(ImGui::GetIO().WantCaptureMouse) return;                                        // mouse is over the dev gui
+
     int x;
     int y;
     camera::WorldToGrid(input->mouse_x, input->mouse_y, &x, &y, level);
-    // Sprite* preview = GetSprite(editor->object_to_place_id, spriteBuffer);
-    Sprite* preview = GetSprite(SPRITE_ID::Fallback, spriteBuffer);
-    if(preview != nullptr){
-      RenderSprite_OnTile(preview, level, renderer, camera, x, y, 1, 0.5);
+
+    SpriteRenderInfo preview;
+    if(editor->object_to_place_id == ENTITY_ID::PLAYER){
+      preview = {0, GetSprite(SPRITE_ID::Medusa_Rotate, spriteBuffer)};   // first frame of her rotate sheet
     }
+    else{
+      preview = GetSpriteFromID(editor->object_to_place_id, spriteBuffer);
+    }
+    RenderSprite_OnTile(preview, level, renderer, camera, x, y, 1, 0.5f);
   }
+
   void Update(Editor* editor, Input* input, LevelData* level, CommandBuffer* commandBuffer){
+    if(ImGui::GetCurrentContext() == nullptr || ImGui::GetIO().WantCaptureMouse){
+      return;
+    }
     if(MousePressed(input, MouseButtons::LEFT)){
       if(camera::GetIsPointInsideGrid(input->mouse_x, input->mouse_y, level)){
         int x;
