@@ -27,6 +27,7 @@ struct Gameplay {
   LevelData* levels;
   int levelCount;
   int currentLevelIndex;
+  int loadedLevelCount;
   float undo_timer;
   Position* input_buffer;
   int input_buffer_capacity;

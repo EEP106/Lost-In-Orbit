@@ -11,4 +11,5 @@ extern "C" {
    __declspec(dllexport) void OnQuit(SDL_Renderer* renderer);
    bool TryMove(Entity* mover, LevelData* level,  CommandBuffer* cmd_buffer, int xDir, int yDir, int strength);
    void ChangeScene(GameData* data, SCENE_TYPES new_scene);
+   void StartLevel(Gameplay* gameplay, Memory::Arena* arena_commands, Memory::Arena* arena_entities);
 }

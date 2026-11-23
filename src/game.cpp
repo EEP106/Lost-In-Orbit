@@ -25,13 +25,21 @@
 
 static bool g_show_walkable_outlines = false;
 
+static const char* LEVEL_PATHS[] = {
+  "assets/levels/level_01.tmj",
+  "assets/levels/level_02.tmj",
+};
+
 extern "C" {
   
   void InitializeGame(Gameplay* gameplay, Arena* arena_levels, Tileset* tilesetBuffer){
     assert(gameplay->initialized == false);
-    gameplay->currentLevelIndex = 0;
-    CreateLevel(arena_levels, &gameplay->levels[0], &tilesetBuffer[(int)TILESETS::Dungeon], "assets/levels/level_01.tmj");
-    CreateLevel(arena_levels, &gameplay->levels[1], &tilesetBuffer[(int)TILESETS::Dungeon], "assets/levels/level_02.tmj");
+    gameplay->loadedLevelCount = 0;
+
+    for(const char* path : LEVEL_PATHS){
+      CreateLevel(arena_levels, &gameplay->levels[gameplay->loadedLevelCount++], &tilesetBuffer[(int)TILESETS::Dungeon], path);
+    }
+    
     gameplay->initialized = true;
   }
   

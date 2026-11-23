@@ -4,10 +4,13 @@
 #include "command.h"
 #include "common.h"
 #include "gameState.h"
+#include "game.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdlrenderer3.h"
 #include "SDL3/SDL_render.h"
 #include "imgui/imgui_internal.h"
+#include <cstdio>
+#include <cstring>
 #include <cstddef>
 #include <string>
 
@@ -79,6 +82,32 @@ void Draw_History(LevelData* level, CommandBuffer* commandBuffer){
   }
 }
 
+void Draw_Level_List(GameData* data){
+  Gameplay* gameplay = &data->scenes.gameplay;
+  if(!gameplay->initialized) return;
+
+  ImGui::Text("levels");
+  for(int i = 0; i < gameplay->loadedLevelCount; i++){
+    const char* path = gameplay->levels[i].level_path;
+    const char* name = strrchr(path, '/');
+
+    char label[128];
+    snprintf(label, sizeof(label), "%d: %s", i, name);
+
+    ImGui::PushID(i);
+    if(ImGui::Selectable(label, i == gameplay->currentLevelIndex)){
+      gameplay->currentLevelIndex = i;
+      if(data->scene_current != SCENE_TYPES::GAME){
+        ChangeScene(data, SCENE_TYPES::GAME);      // starts the level as part of the scene change
+      }
+      else{
+        StartLevel(gameplay, data->arena_commands, data->arena_entities);
+      }
+    }
+    ImGui::PopID();
+  }
+}
+
 void DEV::Draw(GameData* data, SDL_Renderer* renderer){
   ImGui::Begin("Dev Tools");
   ImGui::Text("memory arena usage amount");
@@ -100,6 +129,8 @@ void DEV::Draw(GameData* data, SDL_Renderer* renderer){
 
   ImGui::SliderFloat("deltaTimeScaler", data->dt_scaler, 0.1, 3);  
   
+  Draw_Level_List(data);
+
   ImGui::End();
 
   if(data->editor_data.edit_level){
