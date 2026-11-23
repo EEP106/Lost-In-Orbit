@@ -10,7 +10,7 @@
  "spacing":0,
  "tilecount":4,
  "tiledversion":"1.12.2",
- "tileheight":887,
+ "tileheight":1024,
  "tiles":[
         {
          "height":16,
@@ -41,7 +41,7 @@
                 }]
         }, 
         {
-         "height":16,
+         "height":512,
          "id":2,
          "image":"..\/sprites\/rock.png",
          "imageheight":512,
@@ -52,15 +52,15 @@
                  "type":"string",
                  "value":"rock"
                 }],
-         "width":16,
+         "width":512,
          "x":2,
          "y":3
         }, 
         {
          "id":3,
          "image":"..\/sprites\/test_entity.png",
-         "imageheight":887,
-         "imagewidth":423,
+         "imageheight":1024,
+         "imagewidth":512,
          "properties":[
                 {
                  "name":"entity_name",
@@ -68,7 +68,7 @@
                  "value":"test_entity"
                 }]
         }],
- "tilewidth":423,
+ "tilewidth":512,
  "type":"tileset",
  "version":"1.10"
 }
