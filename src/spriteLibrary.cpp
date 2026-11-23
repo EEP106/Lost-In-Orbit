@@ -11,7 +11,7 @@ using namespace std;
 
 const char* FALLBACK_PATH = "assets/sprites/fallback.png";
 
-// X axis is negative ofset, so if you want to move the sprite to the left make the first number after the sprite folder path higher (tack Max)
+// X axis is negative ofset, so if you want to move the sprite to the left make the first number after the sprite folder path higher
 
 static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Fallback, FALLBACK_PATH,8,8},

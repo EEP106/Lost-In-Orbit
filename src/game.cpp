@@ -23,6 +23,8 @@
 #include <cmath>
 #include <algorithm>
 
+static bool g_show_walkable_outlines = false;
+
 extern "C" {
   
   void InitializeGame(Gameplay* gameplay, Arena* arena_levels, Tileset* tilesetBuffer){
@@ -284,6 +286,9 @@ extern "C" {
     if(KeyPressed(&data->input, SDL_SCANCODE_F2)){
       editorData->edit_level = !editorData->edit_level;
     }
+    if(KeyPressed(&data->input, SDL_SCANCODE_TAB)){
+      g_show_walkable_outlines = !g_show_walkable_outlines;
+    }
     if(editorData->edit_level){
       EDITOR::Update(&editorData->editor, &data->input, GetCurrentLevel(gameplay), gameplay->commandBuffer);
     }
@@ -367,6 +372,38 @@ extern "C" {
     return false;
   }
   
+  static void DrawWalkableOutlines(GameData* data, SDL_Renderer* renderer){
+    LevelData* level = GetCurrentLevel(&data->scenes.gameplay);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // color of the outline (r,g,b,alpha)
+    
+    const float size = TILE_SIZE_PX_SCALED;
+    const float gap = size * 0.1f; // gap between the tile edge and the square
+    const float border = UPSCALE_FACTOR; // border size based on upscale factor so the tickness is allways the same even at different zoom levels
+    
+    const float inner = size - 2 * gap;   // side length of the square
+    
+    for(int gx = 0; gx < level->w; gx++){
+      for(int gy = 0; gy < level->h; gy++){
+        if(!IsWalkable(gx, gy, level)) continue;
+        
+        float x = gx;
+        float y = gy;
+        camera::GridToWorld(&x, &y, level);
+        x += gap;
+        y += gap;
+        
+        SDL_FRect top    = {x,                 y,                 inner,  border};
+        SDL_FRect bottom = {x,                 y + inner - border, inner,  border};
+        SDL_FRect left   = {x,                 y + border,        border, inner - 2 * border};
+        SDL_FRect right  = {x + inner - border, y + border,        border, inner - 2 * border};
+        SDL_RenderFillRect(renderer, &top);
+        SDL_RenderFillRect(renderer, &bottom);
+        SDL_RenderFillRect(renderer, &left);
+        SDL_RenderFillRect(renderer, &right);
+      }
+    }
+  }
+  
   void DrawScene(GameData* data, SCENE_TYPES scene, SDL_Renderer* renderer){
     switch(scene){
       case SCENE_TYPES::TITLESCREEN:
@@ -389,21 +426,24 @@ extern "C" {
         SDL_GetCurrentRenderOutputSize(renderer, &w, &h);
         float asset_scale_background_asset = std::max((float)w / background_asset->width, (float)h / background_asset->height) / (UPSCALE_FACTOR*3);
         float asset_scale_background_asset_2 = std::max((float)w / background_asset_2->width, (float)h / background_asset_2->height) / (UPSCALE_FACTOR*3);
-
-
+        
+        
         float t = (float)(*data->ticks_total) / FPS;   // seconds since level start
         float asteroid_speed = 0.05f;                  // window widths per second
-
+        
         // first and second float is startpos in window lengths (0.0 lest most pos of creen 1 is rightmost), last float is when the movement repeats so 1.1 is 10% of screen etc.
         float background_asset_x = -0.15f + fmodf(t * asteroid_speed, 1.4f);
         float background_asset_y = 0.3f;
         RenderSprite_World(background_asset, renderer, nullptr, w * background_asset_x, h * background_asset_y, asset_scale_background_asset);
-
+        
         float background_asset_2_x = 1.15f - fmodf(t * asteroid_speed, 1.4f);
         float background_asset_2_y = 0.7f;
         RenderSprite_World(background_asset_2, renderer, nullptr, w * background_asset_2_x, h * background_asset_2_y, asset_scale_background_asset_2);
-
+        
         RenderLevel(data, renderer);
+        if(g_show_walkable_outlines){
+          DrawWalkableOutlines(data, renderer);
+        }
         RenderEntities(data, renderer);
         break;}
         case SCENE_TYPES::CREDITS:
