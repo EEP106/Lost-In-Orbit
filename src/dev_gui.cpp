@@ -13,6 +13,8 @@
 #include <cstring>
 #include <cstddef>
 #include <string>
+#include <filesystem>
+#include <system_error>
 
 using namespace std;
 
@@ -130,6 +132,24 @@ void DEV::Draw(GameData* data, SDL_Renderer* renderer){
   ImGui::SliderFloat("deltaTimeScaler", data->dt_scaler, 0.1, 3);  
   
   Draw_Level_List(data);
+
+  if(ImGui::Button("reload level from file")){
+    Gameplay* gameplay = &data->scenes.gameplay;
+    if(gameplay->initialized){
+      LevelData* level = GetCurrentLevel(gameplay);
+
+      namespace fs = std::filesystem;
+      fs::path source = fs::path(SOURCE_ASSETS_DIR) / fs::path(level->level_path).lexically_relative("assets");
+      std::error_code ec;
+      fs::copy_file(source, level->level_path, fs::copy_options::overwrite_existing, ec);
+      if(ec){
+        printf("could not copy %s: %s\n", source.string().c_str(), ec.message().c_str());
+      }
+
+      CreateLevel(data->arena_levels, level, const_cast<Tileset*>(level->tileset), level->level_path);
+      StartLevel(gameplay, data->arena_commands, data->arena_entities);
+    }
+  }
 
   ImGui::End();
 

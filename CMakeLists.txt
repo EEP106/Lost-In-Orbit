@@ -56,6 +56,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 # GAME DLL
 add_library(${DLL_NAME} SHARED ${DLL_EXCLUSIVE} ${IMGUI})
 target_include_directories(${DLL_NAME} PRIVATE include src_external)
+target_compile_definitions(${DLL_NAME} PRIVATE SOURCE_ASSETS_DIR="${DIR_ASSETS_ORIGIN}")
 target_link_libraries(${DLL_NAME} PRIVATE 
     ${LIB_FILES}
     ${SHARED_LIB_NAME}

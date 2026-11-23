@@ -23,6 +23,8 @@ struct LevelData{
   int entityCount;
   const Tileset* tileset;
   uint16_t* overlay_cells;
+  int cell_capacity;
+  int goal_capacity;
 };
 
 

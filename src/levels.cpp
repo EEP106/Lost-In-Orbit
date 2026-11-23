@@ -11,6 +11,7 @@ using namespace std;
 using namespace nlohmann;
 
 void CreateLevel(Arena* arena, LevelData* level, Tileset* tileset, const char* level_name){
+  level->goalCount = 0;
   fstream stream(level_name);
   auto result = json::parse(stream);
   
@@ -24,7 +25,12 @@ void CreateLevel(Arena* arena, LevelData* level, Tileset* tileset, const char* l
   level->h = result["height"].get<int>();
   level->level_path = level_name;
   level->tileset = tileset;
-  level->cells = ALLOC_ARRAY(arena, uint16_t, level->w * level->h);
+  int cell_count = level->w * level->h;
+  if(level->cell_capacity < cell_count){
+    level->cells = ALLOC_ARRAY(arena, uint16_t, cell_count);
+    level->overlay_cells = ALLOC_ARRAY(arena, uint16_t, cell_count);
+    level->cell_capacity = cell_count;
+  }
   for (int i = 0; i < level->w * level->h; i++) {
     int local_id = levelData[i] - id_offset;
     if(local_id < 0){
@@ -45,17 +51,21 @@ void CreateLevel(Arena* arena, LevelData* level, Tileset* tileset, const char* l
         level->goalCount++;
       }
       
-      level->overlay_cells = nullptr;
+      for (int i = 0; i < cell_count; i++) {
+        level->overlay_cells[i] = 0;
+      }
       vector<uint16_t> overlay = AssetManagement::GetCellDataFromJsonLayer(result, "level_overlay", &found);
       if(found){
-        level->overlay_cells = ALLOC_ARRAY(arena, uint16_t, level->w * level->h);
-        for (int i = 0; i < level->w * level->h; i++) {
+        for (int i = 0; i < cell_count; i++) {
           level->overlay_cells[i] = overlay[i] == 0 ? 0 : GetLocalTileID(overlay[i], result) + 1;
         }
       }
     }
     
-    level->goals = ALLOC_ARRAY(arena, Goal, level->goalCount);
+    if(level->goal_capacity < level->goalCount){
+      level->goals = ALLOC_ARRAY(arena, Goal, level->goalCount);
+      level->goal_capacity = level->goalCount;
+    }
     int index = 0;
     for (int i = 0; i < level->w * level->h; i++) {
       int local_id = onLevel[i] - id_offset + 1;
@@ -140,9 +150,9 @@ void RemoveEntity(int x, int y, LevelData* level){
 bool IsWalkable(int x, int y, LevelData* level){
   if(x < 0 || y < 0 || x >= level->w || y >= level->h) return false;
   int i = y * level->w + x;
-
+  
   if(!level->tileset->walkableBuffer[level->cells[i]]) return false;
-
+  
   if(level->overlay_cells != nullptr && level->overlay_cells[i] != 0){
     if(!level->tileset->walkableBuffer[level->overlay_cells[i] - 1]) return false;   // stored as id + 1
   }

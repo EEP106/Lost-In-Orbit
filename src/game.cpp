@@ -28,7 +28,6 @@ static bool g_show_walkable_outlines = false;
 static const char* LEVEL_PATHS[] = {
   "assets/levels/level_01.tmj",
   "assets/levels/level_02.tmj",
-  "assets/levels/level_03.tmj",
 };
 
 extern "C" {
@@ -36,11 +35,13 @@ extern "C" {
   void InitializeGame(Gameplay* gameplay, Arena* arena_levels, Tileset* tilesetBuffer){
     assert(gameplay->initialized == false);
     gameplay->loadedLevelCount = 0;
-
+    
     for(const char* path : LEVEL_PATHS){
-      CreateLevel(arena_levels, &gameplay->levels[gameplay->loadedLevelCount++], &tilesetBuffer[(int)TILESETS::Dungeon], path);
+      LevelData* level = &gameplay->levels[gameplay->loadedLevelCount++];
+      *level = {};
+      CreateLevel(arena_levels, level, &tilesetBuffer[(int)TILESETS::Dungeon], path);
     }
-
+    
     gameplay->initialized = true;
   }
   
@@ -113,9 +114,9 @@ extern "C" {
   
   void UpdateTitlescreen(TitleScreen* titlescreen, const float dt){
   }
-
+  
   enum class QueueActionResult {Nothing, Rotate, Move, MoveFailed};
-
+  
   QueueActionResult QueueAction(Gameplay* gameplay, LevelData* level){
     Entity* entity = GetActiveEntity(gameplay);
     
@@ -141,7 +142,7 @@ extern "C" {
       }
       return QueueActionResult::MoveFailed;
     }
-
+    
     return QueueActionResult::Nothing;
   }
   
@@ -288,21 +289,21 @@ extern "C" {
     if(gameplay->input_buffer_read_count == gameplay->input_buffer_write_count){
       return;
     }
-
+    
     QueueActionResult result = QueueAction(gameplay, level);
-
+    
     switch (result) {
       case QueueActionResult::Nothing:
-        break;
+      break;
       case QueueActionResult::Rotate:
-        Flush(gameplay->commandBuffer, level);
-        break;
+      Flush(gameplay->commandBuffer, level);
+      break;
       case QueueActionResult::Move:
-        Flush(gameplay->commandBuffer, level);
-        gameplay->commandBuffer->timestamp++;
+      Flush(gameplay->commandBuffer, level);
+      gameplay->commandBuffer->timestamp++;
       case QueueActionResult::MoveFailed:
-        gameplay->input_buffer_read_count++;
-        break;
+      gameplay->input_buffer_read_count++;
+      break;
     }
   }  
   
@@ -520,4 +521,5 @@ extern "C" {
     }
     
   }
+  
   
