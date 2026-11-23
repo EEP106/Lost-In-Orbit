@@ -39,7 +39,7 @@ extern "C" {
     for(const char* path : LEVEL_PATHS){
       CreateLevel(arena_levels, &gameplay->levels[gameplay->loadedLevelCount++], &tilesetBuffer[(int)TILESETS::Dungeon], path);
     }
-    
+
     gameplay->initialized = true;
   }
   
@@ -424,7 +424,7 @@ extern "C" {
       case SCENE_TYPES::GAME:{
         
         //renders the bakground in level
-        Sprite* level_background = GetSprite(SPRITE_ID::space_test_backround, data->spriteBuffer);
+        Sprite* level_background = GetSprite(SPRITE_ID::Space_Test_Background, data->spriteBuffer);
         int w, h;
         SDL_GetCurrentRenderOutputSize(renderer, &w, &h);
         float scale = std::max((float)w / level_background->width, (float)h / level_background->height) / UPSCALE_FACTOR;
