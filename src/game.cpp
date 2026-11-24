@@ -33,6 +33,8 @@ static const char* LEVEL_PATHS[] = {
 extern "C" {
   
   void InitializeGame(Gameplay* gameplay, Arena* arena_levels, Tileset* tilesetBuffer){
+    gameplay->paused = false;
+    gameplay->pause_index = 0;
     assert(gameplay->initialized == false);
     gameplay->loadedLevelCount = 0;
     
@@ -105,7 +107,7 @@ extern "C" {
     if(event.type != SDL_EVENT_KEY_DOWN){
       return true;
     }
-    if(event.key.key == SDLK_ESCAPE){
+    if(event.key.key == SDLK_ESCAPE && data->scene_current != SCENE_TYPES::GAME){
       return false;
     }
     
@@ -114,7 +116,101 @@ extern "C" {
   
   void UpdateTitlescreen(TitleScreen* titlescreen, const float dt){
   }
-  
+static const int PAUSE_BUTTON_COUNT = 3;
+static Button g_pause_buttons[PAUSE_BUTTON_COUNT];
+static bool g_pause_ready = false;
+static float g_pause_w = SCREEN_WIDTH;
+static float g_pause_h = SCREEN_HEIGHT;
+
+static void InitPauseButtons(GameData* data){
+  if(g_pause_ready) return;
+    const ButtonType types[PAUSE_BUTTON_COUNT] = {ButtonType::RESUME, ButtonType::MAIN_MENU, ButtonType::QUIT};
+    const char* labels[PAUSE_BUTTON_COUNT] = {"Resume", "Main Menu", "Quit"};
+  for(int i = 0; i < PAUSE_BUTTON_COUNT; i++){
+    SetupButton(&g_pause_buttons[i], types[i], data->spriteBuffer, {0, 0, 300, 80}, Alignment::Centered, &data->font, labels[i]);
+    g_pause_buttons[i].is_dynamic = true;
+    g_pause_buttons[i].sprite = GetSprite(SPRITE_ID::Button_Basic, data->spriteBuffer);
+  }
+  g_pause_ready = true;
+}
+
+static void LayoutPauseButtons(){
+  const float spacing = 100.0f;
+  for(int i = 0; i < PAUSE_BUTTON_COUNT; i++){
+    Button* b = &g_pause_buttons[i];
+    b->rect.x = g_pause_w / 2.0f - b->rect.w / 2.0f;
+    b->rect.y = g_pause_h / 2.0f + (i - (PAUSE_BUTTON_COUNT - 1) / 2.0f) * spacing - b->rect.h / 2.0f;
+  }
+}
+
+static void PressPauseButton(Button* button, GameData* data){
+  switch(button->type){
+    case ButtonType::RESUME:
+      data->scenes.gameplay.paused = false;
+      break;
+    case ButtonType::MAIN_MENU:
+      data->scenes.gameplay.paused = false;
+      ChangeScene(data, SCENE_TYPES::MAINMENU);
+      break;
+    case ButtonType::QUIT:
+      data->running = false;
+      break;
+    default:
+      break;
+  }
+}
+
+static void UpdatePauseMenu(GameData* data){
+  Input* input = &data->input;
+  int& index = data->scenes.gameplay.pause_index;
+  InitPauseButtons(data);
+  LayoutPauseButtons();
+
+  if(input->mouse_magnitude > 0.1){
+    for(int i = 0; i < PAUSE_BUTTON_COUNT; i++){
+      if(IsHoveredOver(&g_pause_buttons[i], input->mouse_x, input->mouse_y)){
+        index = i;
+        break;
+      }
+    }
+  }
+  if(KeyPressed(input, SDL_SCANCODE_UP)){
+    index = (index - 1 + PAUSE_BUTTON_COUNT) % PAUSE_BUTTON_COUNT;
+  }
+  if(KeyPressed(input, SDL_SCANCODE_DOWN)){
+    index = (index + 1) % PAUSE_BUTTON_COUNT;
+  }
+
+  Button* selected = &g_pause_buttons[index];
+  bool clicked = MousePressed(input, MouseButtons::LEFT) && IsHoveredOver(selected, input->mouse_x, input->mouse_y);
+  if(KeyPressed(input, SDL_SCANCODE_RETURN) || clicked){
+    PressPauseButton(selected, data);
+  }
+}
+
+static void DrawPauseMenu(GameData* data, SDL_Renderer* renderer, float w, float h){
+  g_pause_w = w;
+  g_pause_h = h;
+  InitPauseButtons(data);
+  LayoutPauseButtons();
+  int index = data->scenes.gameplay.pause_index;
+
+  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 160);
+  SDL_FRect full = {0, 0, w, h};
+  SDL_RenderFillRect(renderer, &full);
+  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+
+  for(int i = 0; i < PAUSE_BUTTON_COUNT; i++){
+    Button* b = &g_pause_buttons[i];
+    if(b->is_dynamic){
+      RenderButton_Dynamic(b, i == index, renderer);
+    }
+    else{
+      RenderButton(b, i == index, renderer);
+    }
+  }
+}
   enum class QueueActionResult {Nothing, Rotate, Move, MoveFailed};
   
   QueueActionResult QueueAction(Gameplay* gameplay, LevelData* level){
@@ -358,8 +454,17 @@ extern "C" {
       UpdateMenu(data);
       break;
       case SCENE_TYPES::GAME:
-      UpdateGame(gameplay, &data->input, data->arena_scratch, data->arena_commands, data->arena_entities, dt);
-      break;
+        if(KeyPressed(&data->input, SDL_SCANCODE_ESCAPE)){
+          gameplay->paused = !gameplay->paused;
+          gameplay->pause_index = 0;
+        }
+        if(gameplay->paused){
+          UpdatePauseMenu(data);
+        }
+        else{
+          UpdateGame(gameplay, &data->input, data->arena_scratch, data->arena_commands, data->arena_entities, dt);
+        }
+        break;
       case SCENE_TYPES::CREDITS:
       break;
       case SCENE_TYPES::NONE:
@@ -476,6 +581,9 @@ extern "C" {
           DrawWalkableOutlines(data, renderer);
         }
         RenderEntities(data, renderer);
+        if(data->scenes.gameplay.paused){
+          DrawPauseMenu(data, renderer, (float)w, (float)h);
+        }
         break;}
         case SCENE_TYPES::CREDITS:
         break;

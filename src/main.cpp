@@ -74,27 +74,27 @@ bool LoadDLL(DLL_INFO* info, int depth = 0){
         return false;
     }
     bool success = CopyFile(NAME_OF_DLL, NAME_OF_TEMP_DLL, false);
-
+    
     if(!success){
         Sleep(50);
         return LoadDLL(info, depth + 1);   
     }
-
+    
     info->dll = LoadLibrary(NAME_OF_TEMP_DLL);
-
+    
     if(info->dll == nullptr){
         printf("could not load dll");
         return false;
     }
-
+    
     info->initialize = (Function_Initialize)GetProcAddress(info->dll, NAME_OF_FUNC_INIT);    
     info->handleEvents = (Function_HandleEvents)GetProcAddress(info->dll, NAME_OF_FUNC_HANDLE_EVENT);    
     info->update = (Function_Update)GetProcAddress(info->dll, NAME_OF_FUNC_UPDATE);    
     info->draw = (Function_Draw)GetProcAddress(info->dll, NAME_OF_FUNC_DRAW);    
     info->quit = (Function_OnQuit)GetProcAddress(info->dll, NAME_OF_FUNC_QUIT);    
-
+    
     info->timestamp = GetTimestamp();
-
+    
     return true;
 }
 
@@ -110,7 +110,7 @@ void* AllocateGameMemory(){
         printf("fatal error: could not allocate memory");
         return nullptr;
     }
-
+    
     printf("memory succesfully allocated \n");
     return blob;
 }
@@ -119,7 +119,7 @@ void SDL_Setup(){
     SDL_Init(SDL_INIT_EVENTS);
     SDL_SetLogPriorities(SDL_LOG_PRIORITY_VERBOSE);
     TTF_Init();
-
+    
     window = SDL_CreateWindow("lost in orbit", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
     renderer = SDL_CreateRenderer(window, NULL);
 }
@@ -163,69 +163,69 @@ int main() {
     if(game_memory == nullptr){
         return 1;
     }
-
+    
     SDL_Setup();    
-
+    
     Memory::Arena* arena_main = new Memory::Arena();    
-
+    
     Memory::Initialize(arena_main, game_memory, GAME_MEMORY_ALLOWANCE);
-
+    
     GameData* gameData = ALLOC(arena_main, GameData);
     gameData->arena_main = arena_main;
     gameData->ticks_total = ALLOC(arena_main, uint64_t);
-
+    
     int SPRITE_COUNT = 256;
     size_t IMAGE_ARENA_SIZE = MEGABYTES(1);
     gameData->arena_images = Memory::CreateSubArena(arena_main, IMAGE_ARENA_SIZE);
     gameData->spriteBuffer = ALLOC_ARRAY(gameData->arena_images, Sprite, SPRITE_COUNT);
     gameData->tilesetBuffer = ALLOC_ARRAY(gameData->arena_images, Tileset, (int)TILESETS::COUNT);
-
+    
     gameData->editor_data.fps_buffer_count = 500;
     gameData->editor_data.fps_buffer = ALLOC_ARRAY(arena_main, float, gameData->editor_data.fps_buffer_count);
-
+    
     gameData->arena_scratch = Memory::CreateSubArena(arena_main, KILOBYTES(256));
-
+    
     size_t INPUT_ARENA_SIZE = 0;
     INPUT_ARENA_SIZE += sizeof(bool) * SDL_SCANCODE_COUNT * 2;
     INPUT_ARENA_SIZE += sizeof(float) * SDL_SCANCODE_COUNT * 1;
     INPUT_ARENA_SIZE += 128;
     gameData->arena_input = Memory::CreateSubArena(arena_main, INPUT_ARENA_SIZE);
-
+    
     gameData->input.keys_current = ALLOC_ARRAY(gameData->arena_input, bool, SDL_SCANCODE_COUNT);
     gameData->input.keys_previous = ALLOC_ARRAY(gameData->arena_input, bool, SDL_SCANCODE_COUNT);
     gameData->input.keys_held_time = ALLOC_ARRAY(gameData->arena_input, float, SDL_SCANCODE_COUNT);
     gameData->input.mouse_held_time = ALLOC_ARRAY(gameData->arena_input, float, (int)MouseButtons::COUNT);
-
+    
     gameData->arena_levels   = Memory::CreateSubArena(arena_main, MEGABYTES(3));
     gameData->arena_entities = Memory::CreateSubArena(gameData->arena_levels, KILOBYTES(512));
     gameData->arena_commands = Memory::CreateSubArena(gameData->arena_levels, MEGABYTES(1));
-
+    
     Gameplay* gameplay = &gameData->scenes.gameplay;
     gameplay->input_buffer_capacity = 50;
     gameplay->input_buffer = ALLOC_ARRAY(gameData->arena_levels, Position, gameplay->input_buffer_capacity);
- 
+    
     gameplay->levelCount = 500;
     gameplay->levels = ALLOC_ARRAY(gameData->arena_levels, LevelData, gameplay->levelCount);
     gameplay->commandBuffer = ALLOC(arena_main, CommandBuffer);
     gameplay->commandBuffer->capacity = 20000;
     gameplay->commandBuffer->allCommands = ALLOC_ARRAY(gameData->arena_commands, AnyCommand, gameplay->commandBuffer->capacity);
-
+    
     DLL_INFO dll;
     bool dll_successfully_loaded = LoadDLL(&dll);
-
+    
     if(dll_successfully_loaded == false){
         return 2;
     }    
-
+    
     dll.initialize(gameData, window, renderer);
-  
+    
     MMRESULT result = timeBeginPeriod(1);
     if(result == TIMERR_NOCANDO){
         printf("could not increase timer resolution");
         Sleep(2000);
         return 3;
     }
-
+    
     gameData->running = true;
     float dt;
     float dt_scaler = 1;
@@ -234,11 +234,11 @@ int main() {
     int dll_check_counter = 0;
     
     while(gameData->running){
-
+        
         CalculateDeltaTime(&dt,  dt_scaler);
         
         DLL_CheckStatus(&dll);        
-
+        
         Reset(gameData->arena_scratch);
         
         SDL_Event event;
@@ -247,19 +247,25 @@ int main() {
                 gameData->running = false;
                 break;
             }
-
+            
             gameData->running = dll.handleEvents(gameData, event);
             if(gameData->running == false){
                 break;
             }
-
+            
             if(event.type == SDL_EVENT_KEY_DOWN){
-                if(event.key.key == SDLK_F9){
-                    StoreGameState(arena_main);
+                bool paused = gameData->scene_current == SCENE_TYPES::GAME &&
+                gameData->scenes.gameplay.paused;
+                
+                if(!paused){
+                    if(event.key.key == SDLK_F9){
+                        StoreGameState(arena_main);
+                    }
+                    if(event.key.key == SDLK_F10){
+                        RetrieveGameState(arena_main);
+                    }
                 }
-                if(event.key.key == SDLK_F10){
-                    RetrieveGameState(arena_main);
-                }
+                
                 // Press F for fullscreen and F again to return to original window size
                 if(event.key.key == SDLK_F && !event.key.repeat){
                     bool is_fullscreen = (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN) != 0;
@@ -267,13 +273,13 @@ int main() {
                 }
             }
         }
-
+        
         gameData->input.keys_current = SDL_GetKeyboardState(nullptr);
-
+        
         loop(monkey, 5){
             
         }
-
+        
         
         float* delta_x = &gameData->input.mouse_x_delta;
         float* delta_y = &gameData->input.mouse_y_delta;
@@ -285,17 +291,17 @@ int main() {
         float dx = *delta_x;
         float dy = *delta_y;
         gameData->input.mouse_magnitude = std::sqrt(dx * dx + dy * dy);
-
+        
         dll.update(gameData, dt);
-
+        
         UpdateKeys(&gameData->input, dt);
         UpdateMouse(&gameData->input, dt);
-
+        
         dll.draw(gameData, renderer);
- 
+        
         double time_to_sleep_ms;
         CalculateRemainingFrameTime_MS(&time_to_sleep_ms);
-
+        
         if(time_to_sleep_ms > 0){
             if(time_to_sleep_ms > 1){
                 SDL_Delay(time_to_sleep_ms - 1);
@@ -308,7 +314,7 @@ int main() {
             //printf("missed frame \n");
         }
     }
-
+    
     dll.quit(renderer);
     SDL_Quit();
     return 0;

@@ -9,7 +9,9 @@ struct GameData;
 enum class ButtonType {
   NONE,
   START_GAME,
-  QUIT
+  QUIT,
+  RESUME,
+  MAIN_MENU
 };
 
 struct Button {

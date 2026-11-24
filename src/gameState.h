@@ -36,6 +36,8 @@ struct Gameplay {
   bool initialized;
   int activePlayerIndex;
   Entity** activePlayerBuffer;
+  bool paused;
+  int pause_index;
 };
 
 struct Transition {

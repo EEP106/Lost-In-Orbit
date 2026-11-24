@@ -30,6 +30,11 @@ void SetupButton(Button* button, ButtonType type, Sprite* spriteBuffer, SDL_FRec
   case ButtonType::QUIT:
     button->sprite = GetSprite(SPRITE_ID::Fallback, spriteBuffer);
     break;
+  case ButtonType::RESUME:
+    button->sprite = GetSprite(SPRITE_ID::Button_Basic, spriteBuffer);
+  case ButtonType::MAIN_MENU:
+    button->sprite = GetSprite(SPRITE_ID::Button_Basic, spriteBuffer);
+  break;
   default:
     button->sprite = GetSprite(SPRITE_ID::Fallback, spriteBuffer);
   break;
@@ -58,6 +63,8 @@ void PressButton(Button *button, GameData *data){
   case ButtonType::START_GAME:
     ChangeScene(data, SCENE_TYPES::GAME);
     break;
+  case ButtonType::RESUME:
+  case ButtonType::MAIN_MENU:
   case ButtonType::QUIT:
     data->running = false;
     break;
