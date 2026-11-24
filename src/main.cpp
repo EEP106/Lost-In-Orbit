@@ -233,6 +233,7 @@ int main() {
     gameData->dt_scaler = &dt_scaler;
     int dll_check_counter = 0;
     
+    bool saved_once = false;
     while(gameData->running){
         
         CalculateDeltaTime(&dt,  dt_scaler);
@@ -258,8 +259,9 @@ int main() {
                 
                 if(event.key.key == SDLK_F9){
                     StoreGameState(arena_main);
+                    saved_once = true;
                 }
-                if(event.key.key == SDLK_F10){
+                if(event.key.key == SDLK_F10 && saved_once == true){
                     RetrieveGameState(arena_main);
                 }
                 
