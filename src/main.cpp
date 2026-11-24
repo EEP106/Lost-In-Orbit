@@ -254,17 +254,15 @@ int main() {
             }
             
             if(event.type == SDL_EVENT_KEY_DOWN){
-                bool paused = gameData->scene_current == SCENE_TYPES::GAME &&
-                gameData->scenes.gameplay.paused;
                 
-                if(!paused){
-                    if(event.key.key == SDLK_F9){
-                        StoreGameState(arena_main);
-                    }
-                    if(event.key.key == SDLK_F10){
-                        RetrieveGameState(arena_main);
-                    }
+                
+                if(event.key.key == SDLK_F9){
+                    StoreGameState(arena_main);
                 }
+                if(event.key.key == SDLK_F10){
+                    RetrieveGameState(arena_main);
+                }
+                
                 
                 // Press F for fullscreen and F again to return to original window size
                 if(event.key.key == SDLK_F && !event.key.repeat){
