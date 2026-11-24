@@ -24,6 +24,7 @@
 #include <cmath>
 #include <algorithm>
 
+// bool to control whether walkable outlines are shown
 static bool g_show_walkable_outlines = false;
 
 static const char* LEVEL_PATHS[] = {
@@ -405,12 +406,17 @@ static void DrawPauseMenu(GameData* data, SDL_Renderer* renderer, float w, float
   }  
   
   void Update(GameData* data,float dt){
-    *data->ticks_total += 1;
     TitleScreen* titlescreen = &data->scenes.titlescreen;
     Gameplay* gameplay = &data->scenes.gameplay;
     EditorData* editorData = &data->editor_data;
     Transition* transition = &data->transition;
     
+    // "Freezes" the game when paused my making animations and movement of background assets pause
+    bool is_paused = data->scene_current == SCENE_TYPES::GAME && gameplay->paused;
+      if(!is_paused){
+      *data->ticks_total += 1;
+  }
+
     if(KeyPressed(&data->input, SDL_SCANCODE_F2)){
       editorData->edit_level = !editorData->edit_level;
     }
