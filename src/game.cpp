@@ -20,7 +20,7 @@
 #include "spriteLibrary.h"
 #include "levelRenderer.h"
 #include "tilesetLibrary.h"
-#include "shaders.h"
+#include "rippleShaders.h"
 #include "movement.h"
 #include <cmath>
 #include <algorithm>
@@ -526,32 +526,31 @@ extern "C" {
         Sprite* level_background = GetSprite(SPRITE_ID::Space_Test_Background, data->spriteBuffer);
         int w, h;
         SDL_GetCurrentRenderOutputSize(renderer, &w, &h);
-        float t = (float)(*data->ticks_total) / FPS;   // freezes while paused
+        float ticks = (float)(*data->ticks_total) / FPS;   // freezes while paused
         
-        // background: scaled up 2% so the ripple never shows the screen edge
         float scale = std::max((float)w / level_background->width, (float)h / level_background->height) / UPSCALE_FACTOR;
-        scale *= 1.02f;
-        SHADERS::BeginRipple(renderer, 0, {t, 0.004f, 3.0f, 1.2f, 0.0f});
+        scale *= 1.02f; // 2% scale up so the ripple effect doesn't show the edges of the background sprite
+        SHADERS::BeginRipple(renderer, 0, {ticks, 0.004f, 3.0f, 1.2f, 0.0f});
         RenderSprite_World(level_background, renderer, nullptr, w / 2.0f, h / 2.0f, scale);
-        SHADERS::EndShader(renderer);
+        SHADERS::EndRipple(renderer);
         
         Sprite* background_asset = GetSprite(SPRITE_ID::Background_Asteroid_1, data->spriteBuffer);
         Sprite* background_asset_2 = GetSprite(SPRITE_ID::Background_Asteroid_2, data->spriteBuffer);
         float asset_scale_background_asset = std::max((float)w / background_asset->width, (float)h / background_asset->height) / (UPSCALE_FACTOR*3);
         float asset_scale_background_asset_2 = std::max((float)w / background_asset_2->width, (float)h / background_asset_2->height) / (UPSCALE_FACTOR*3);
-        float asteroid_speed = 0.05f;
+        float asteroid_speed = 0.02f;
         
-        float background_asset_x = -0.15f + fmodf(t * asteroid_speed, 1.4f);
+        float background_asset_x = -0.15f + fmodf(ticks * asteroid_speed, 1.4f);
         float background_asset_y = 0.3f;
-        SHADERS::BeginRipple(renderer, 1, {t, 0.01f, 4.0f, 1.6f, 1.0f});
+        //SHADERS::BeginRipple(renderer, 1, {ticks, 0.01f, 4.0f, 1.6f, 1.0f});
         RenderSprite_World(background_asset, renderer, nullptr, w * background_asset_x, h * background_asset_y, asset_scale_background_asset);
-        SHADERS::EndShader(renderer);
+        //SHADERS::EndRipple(renderer);
         
-        float background_asset_2_x = 1.15f - fmodf(t * asteroid_speed, 1.4f);
+        float background_asset_2_x = 1.15f - fmodf(ticks * asteroid_speed, 1.4f);
         float background_asset_2_y = 0.7f;
-        SHADERS::BeginRipple(renderer, 2, {t, 0.01f, 4.0f, 1.6f, 3.0f});
+        //SHADERS::BeginRipple(renderer, 2, {ticks, 0.01f, 4.0f, 1.6f, 3.0f});
         RenderSprite_World(background_asset_2, renderer, nullptr, w * background_asset_2_x, h * background_asset_2_y, asset_scale_background_asset_2);
-        SHADERS::EndShader(renderer);
+        //SHADERS::EndRipple(renderer);
         
         RenderLevel(data, renderer);
         if(g_show_walkable_outlines){
@@ -603,7 +602,7 @@ extern "C" {
     
     void OnQuit(SDL_Renderer* renderer){
       SDL_DestroyRenderer(renderer);
-      SHADERS::Shutdown(renderer);
+      SHADERS::KillRipple(renderer);
     }
     
   }

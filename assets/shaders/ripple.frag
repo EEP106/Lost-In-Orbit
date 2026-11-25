@@ -1,16 +1,10 @@
 #version 450
 
-// Ripple: shifts every row of the sprite sideways with a moving sine wave.
-// Compile to SPIR-V with:   glslc ripple.frag -o ripple.frag.spv
-// (or:                      glslangValidator -V ripple.frag -o ripple.frag.spv)
-
-// Outputs of SDL's 2D renderer vertex shader
+// The tint SDL gives the sprite
 layout(location = 0) in vec4 v_color;
 layout(location = 1) in vec2 v_uv;
-
 layout(location = 0) out vec4 out_color;
 
-// SDL_GPU conventions for fragment shaders: samplers in set 2, uniform buffers in set 3
 layout(set = 2, binding = 0) uniform sampler2D u_texture;
 
 layout(set = 3, binding = 0) uniform RippleParams {

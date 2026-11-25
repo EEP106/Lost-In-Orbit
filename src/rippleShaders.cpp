@@ -1,4 +1,4 @@
-#include "shaders.h"
+#include "rippleShaders.h"
 #include "SDL3/SDL_gpu.h"
 #include "SDL3/SDL_iostream.h"
 #include "SDL3/SDL_log.h"
@@ -12,9 +12,9 @@ namespace {
   const char* RIPPLE_SPIRV_PATH = "assets/shaders/ripple.frag.spv";
 
   struct RippleUniforms {
-    float time;
-    float amplitude;
-    float frequency;
+    float time; // so that the ripples freeze when paused
+    float amplitude; // how much the ripple moves the pixels
+    float frequency; // how many ripples fit in the screen from top to bottom
     float speed;
     float phase;
     float pad0;
@@ -70,8 +70,6 @@ namespace {
     return shader;
   }
 
-  // One render state per slot. Uniform data belongs to the state, so sprites that use
-  // different params in the same frame need different states.
   SDL_GPURenderState* GetRippleState(SDL_Renderer* renderer, int slot){
     if(slot < 0 || slot >= SHADERS::MAX_RIPPLE_SLOTS){
       return nullptr;
@@ -128,11 +126,11 @@ namespace SHADERS {
     SDL_SetGPURenderState(renderer, state);
   }
 
-  void EndShader(SDL_Renderer* renderer){
+  void EndRipple(SDL_Renderer* renderer){
     SDL_SetGPURenderState(renderer, nullptr);
   }
 
-  void Shutdown(SDL_Renderer* renderer){
+  void KillRipple(SDL_Renderer* renderer){
     SDL_PropertiesID props = SDL_GetGlobalProperties();
     SDL_SetGPURenderState(renderer, nullptr);
 
