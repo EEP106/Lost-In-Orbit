@@ -163,10 +163,15 @@ uint16_t GetCellID(LevelData* level, int x, int y){
   return level->cells[y * level->w + x];
 }
 
-Entity* GetEntity(LevelData* level, int x, int y){
-  for (int i = 0; i < level->entityCount; i++) {
-    if(level->entityBuffer[i].x == x && level->entityBuffer[i].y == y){
-      return &level->entityBuffer[i];
+Entity* GetEntity(LevelData* level, int x, int y, int* entityIndex){
+  return GetEntity(level->entityBuffer, level->entityCount, x, y, entityIndex);
+}
+
+Entity* GetEntity(Entity* entities, int length, int x, int y, int* entityIndex){
+  for (int i = 0; i < length; i++) {
+    if(entities[i].x == x && entities[i].y == y){
+      if (entityIndex != nullptr) *entityIndex = i;
+      return &entities[i];
     }
   }
   

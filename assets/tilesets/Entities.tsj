@@ -8,7 +8,7 @@
  "margin":0,
  "name":"Entities",
  "spacing":0,
- "tilecount":4,
+ "tilecount":5,
  "tiledversion":"1.12.2",
  "tileheight":1024,
  "tiles":[
@@ -67,6 +67,12 @@
                  "type":"string",
                  "value":"test_entity"
                 }]
+        }, 
+        {
+         "id":4,
+         "image":"..\/sprites\/slime.png",
+         "imageheight":512,
+         "imagewidth":512
         }],
  "tilewidth":512,
  "type":"tileset",

@@ -10,6 +10,7 @@ enum class SPRITE_ID{
   Medusa_Idle_Left,
   Medusa_Idle_Front,
   Medusa_Idle_Back,
+  Slime,
   Dropshadow,
   titlescreen_background,
   Space_Test_Background,

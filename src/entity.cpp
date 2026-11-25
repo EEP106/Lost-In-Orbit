@@ -36,7 +36,7 @@ void SnapEntityToEndOfAction(Entity* entity){
       case ENTITY_ID::PLAYER:
       SetBehaviour(entity, (Behaviour)(CAN_ROTATE | CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
       AddBehaviour(entity, Behaviour::JUMPS);
-      entity->strength = 1;
+      entity->strength = 999;
       break;  
       case ENTITY_ID::ROCK:
       SetBehaviour(entity, (Behaviour)CAN_MOVE);
@@ -44,6 +44,9 @@ void SnapEntityToEndOfAction(Entity* entity){
       case ENTITY_ID::TEST_ENTITY:
       SetBehaviour(entity, (Behaviour)CAN_MOVE);
       break;
+      case ENTITY_ID::SLIME:
+      SetBehaviour(entity, CAN_MOVE);
+        break;
     }
   }
   

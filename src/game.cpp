@@ -21,6 +21,7 @@
 #include "levelRenderer.h"
 #include "tilesetLibrary.h"
 #include "movement.h"
+#include "slime.h"
 #include <cmath>
 #include <algorithm>
 
@@ -215,7 +216,7 @@ static void DrawPauseMenu(GameData* data, SDL_Renderer* renderer, float w, float
 }
   enum class QueueActionResult {Nothing, Rotate, Move, MoveFailed};
   
-  QueueActionResult QueueAction(Gameplay* gameplay, LevelData* level){
+  QueueActionResult QueueAction(Gameplay* gameplay, LevelData* level, Arena* arena_scratch){
     Entity* entity = GetActiveEntity(gameplay);
     
     if(!HasBehaviour(entity, (Behaviour)(RESPOND_TO_INPUT | CAN_MOVE))){
@@ -236,6 +237,7 @@ static void DrawPauseMenu(GameData* data, SDL_Renderer* renderer, float w, float
       bool moved = TryMove(entity, level, gameplay->commandBuffer, xDir, yDir, entity->strength);
       if(moved){
         PlaySFX(SFX_ID::JUMP);
+        MoveSlime(arena_scratch, level, gameplay->commandBuffer, xDir, yDir);
         return QueueActionResult::Move;
       }
       return QueueActionResult::MoveFailed;
@@ -388,7 +390,7 @@ static void DrawPauseMenu(GameData* data, SDL_Renderer* renderer, float w, float
       return;
     }
     
-    QueueActionResult result = QueueAction(gameplay, level);
+    QueueActionResult result = QueueAction(gameplay, level, arena_scratch);
     
     switch (result) {
       case QueueActionResult::Nothing:

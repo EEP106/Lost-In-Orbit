@@ -37,10 +37,33 @@ inline Direction DirectionFromXY(int xDir, int yDir){
   else           { return Direction::DOWN;  }
 }
 
+inline void XYFromDirection(Direction dir, int& xDir, int& yDir){
+  switch (dir) {
+
+    case Direction::RIGHT:
+      xDir = 1;
+      yDir = 0;
+      break;
+    case Direction::LEFT:
+      xDir = -1;
+      yDir = 0;
+      break;
+    case Direction::UP:
+      xDir = 0;
+      yDir = 1;
+      break;
+    case Direction::DOWN:
+      xDir = 0;
+      yDir = -1;
+      break;
+  }
+}
+
 enum class ENTITY_ID : uint8_t {
   PLAYER = 0,
   ROCK = 2,
-  TEST_ENTITY = 3
+  TEST_ENTITY = 3,
+  SLIME = 4,
 };
 
 struct Position{

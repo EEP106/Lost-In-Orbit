@@ -35,7 +35,8 @@ Entity* GetNextAvailableEntity(Entity* entityBuffer, int bufferSize);
 void AddEntity(ENTITY_ID entity_id, int x, int y, LevelData* level);
 void RemoveEntity(int x, int y, LevelData* level);
 uint16_t GetCellID(LevelData* level ,int x, int y);
-Entity* GetEntity(LevelData* level, int x, int y);
+Entity* GetEntity(LevelData* level, int x, int y, int* entityIndex = nullptr);
+Entity* GetEntity(Entity* entities, int length, int x, int y, int* entityIndex = nullptr);
 Entity* RaycastFirstEntity(int x_origin, int y_origin, Direction direction, LevelData* level, bool ignore_walls = false);
 
 namespace AssetManagement{

@@ -28,6 +28,7 @@ static const SpriteDataEntry all_sprite_data[] = {
   },
   {SPRITE_ID::Medusa_Idle_Front, "assets/sprites/medusa_idle_front.png", 12, 24, 4, 1, 8},
   {SPRITE_ID::Medusa_Idle_Back, "assets/sprites/medusa_idle_back.png", 12, 24, 4, 1, 8},
+  {SPRITE_ID::Slime, "assets/sprites/slime.png"},
   {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 256, 256},
   {SPRITE_ID::black_1x1, "assets/sprites/1x1_black.png",0,0},
   {SPRITE_ID::titlescreen_background, "assets/sprites/titlescreen.png"},
@@ -117,6 +118,8 @@ SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer,
     return GetSprite(SPRITE_ID::Rock, spritebuffer);
     case ENTITY_ID::TEST_ENTITY:
     return GetSprite(SPRITE_ID::test_entity, spritebuffer);
+    case ENTITY_ID::SLIME:
+    return GetSprite(SPRITE_ID::Slime, spritebuffer);
     default:
     return GetSprite(SPRITE_ID::Fallback, spritebuffer);
   }  
@@ -144,8 +147,11 @@ Sprite* GetSpriteFromID(ENTITY_ID id, Sprite* spriteBuffer){
     case ENTITY_ID::PLAYER:
     sprite_to_return = nullptr;
     break;
-  }
-  
+    case ENTITY_ID::SLIME:
+    sprite_to_return = &spriteBuffer[(int)SPRITE_ID::Slime];
+    break;
+    }
+
   if(sprite_to_return == nullptr || sprite_to_return->texture == nullptr){
     sprite_to_return = &spriteBuffer[(int)SPRITE_ID::Fallback];
   }
