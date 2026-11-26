@@ -16,7 +16,7 @@ bool TryMove(Entity* mover, LevelData* level,CommandBuffer* commandBuffer, int x
   Entity* stepInto_entity = GetEntity(level, test_x, test_y);
   uint16_t stepInto_tile_id = GetCellID(level, test_x, test_y);
   if(stepInto_entity == nullptr){
-    if(IsWalkable(test_x, test_y, level)){
+    if(!IsSolid(test_x, test_y, level)){
       MoveCommand mv(mover, xDir, yDir);
       Queue(commandBuffer, mv);
       return true;

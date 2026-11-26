@@ -45,9 +45,11 @@ namespace AssetManagement{
     auto jsonResult = json::parse(stream);
     int tile_count = jsonResult["tilecount"].get<int>();
     tileset->walkableBuffer = ALLOC_ARRAY(arena_images, bool, tile_count);
+    tileset->solidBuffer = ALLOC_ARRAY(arena_images, bool, tile_count);
     
     for (int i = 0; i < tile_count; i++) {
       tileset->walkableBuffer[i] = true;
+      tileset->solidBuffer[i] = false;
     }
     
     auto& tiles = jsonResult["tiles"];
@@ -58,6 +60,9 @@ namespace AssetManagement{
       for(const auto& tile_property : tile["properties"]){
         if(tile_property["name"] == "walkable"){
           tileset->walkableBuffer[tile_id] = tile_property["value"].get<bool>();
+        }
+        if(tile_property["name"] == "solid"){
+          tileset->solidBuffer[tile_id] = tile_property["value"].get<bool>();
         }
       }
     }

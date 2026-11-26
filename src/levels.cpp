@@ -159,6 +159,18 @@ bool IsWalkable(int x, int y, LevelData* level){
   return true;
 }
 
+bool IsSolid(int x, int y, LevelData* level){
+  if(x < 0 || y < 0 || x >= level->w || y >= level->h) return true;
+  int i = y * level->w + x;
+  
+  if(level->tileset->solidBuffer[level->cells[i]]) return true;
+
+  if(level->overlay_cells != nullptr && level->overlay_cells[i] != 0){
+    if(level->tileset->solidBuffer[level->overlay_cells[i] - 1]) return true;   // stored as id + 1
+  }
+  return false;
+}
+
 uint16_t GetCellID(LevelData* level, int x, int y){
   return level->cells[y * level->w + x];
 }
@@ -199,7 +211,7 @@ Entity* RaycastFirstEntity(int x_origin, int y_origin, Direction direction, Leve
   int y_search = y_origin + facingVector.y;
   
   while(x_search > 0 && x_search < level->w && y_search > 0 && y_search < level->h){
-    if(!ignore_walls && !IsWalkable(x_search, y_search, level)){
+    if(!ignore_walls && !IsSolid(x_search, y_search, level)){
       break;
     }
     

@@ -71,6 +71,56 @@ void Execute(AnyCommand cmd, LevelData* level, CommandBuffer* commandBuffer, Fro
     }
 }
 
+void Revert(AnyCommand cmd, LevelData* level, CommandBuffer* commandBuffer){    
+  switch(cmd.command.type){
+    case CMD_TYPE::NONE:
+      break;
+    case CMD_TYPE::MOVE:{
+      MoveCommand mv = cmd.move;
+      mv.entity->x -= mv.xDir;      
+      mv.entity->y -= mv.yDir;
+      mv.entity->progress_01 = 1;
+      }
+       break;
+    case CMD_TYPE::ROTATE:{
+      RotateCommand rotate = cmd.rotate;
+      if(!HasBehaviour(rotate.entity, CAN_ROTATE)){
+        break;
+      }
+      rotate.entity->facing_current = rotate.from;
+      rotate.entity->progress_01 = 1;
+      break;
+      }
+    case CMD_TYPE::MODIFY_BEHAVIOUR: {
+      ModifyBehaviourCommand modify = cmd.modify;
+      if(modify.mode == ModifyBehaviourCommand::ADD){
+        RemoveBehaviour(modify.entity, modify.flag); 
+      }
+      else{
+        AddBehaviour(modify.entity, modify.flag); 
+      }
+      break;
+    }
+    case CMD_TYPE::ADD:{
+        AddCommand* add = &cmd.add;
+        RemoveEntity(add->x, add->y, level);
+        break;          
+      }
+    case CMD_TYPE::REMOVE:{
+        RemoveCommand* remove = &cmd.remove;
+        AddEntity(remove->storedID, remove->x, remove->y, level);
+        Entity* entity = GetEntity(level, remove->x, remove->y);
+        SetBehaviour(entity, remove->storedBehaviour); 
+        break;            
+      }
+    case CMD_TYPE::SWAP_ACTIVE:{
+        SwapActiveEntityCommand* swap = &cmd.swap_active;
+        *swap->value_to_change = swap->index_previous;
+        break;
+      }
+    }
+}
+
 void Queue(CommandBuffer *buffer, AnyCommand cmd){
   assert(cmd.command.type != CMD_TYPE::NONE);
 
@@ -95,14 +145,20 @@ void Push(CommandBuffer* buffer, AnyCommand cmd, LevelData* level){
   buffer->head = buffer->queueHead;
 }
 
-void Flush(CommandBuffer* Buffer, LevelData* level){
-  assert(Buffer->index < Buffer->queueHead); // Nothing to flush
-  while(Buffer->index < Buffer->queueHead){
-    AnyCommand command = Buffer->allCommands[Buffer->index];
-    Execute(command, level, Buffer);
-    Buffer->index++;
+void Flush(CommandBuffer* buffer, LevelData* level){
+  assert(buffer->index < buffer->queueHead); // Nothing to flush
+  while(buffer->index < buffer->queueHead){
+    AnyCommand command = buffer->allCommands[buffer->index];
+    Execute(command, level, buffer);
+    buffer->index++;
   }
-  Buffer->head = Buffer->index;
+  buffer->head = buffer->index;
+}
+
+void CancleQueue(CommandBuffer* buffer, LevelData* level){
+  assert(buffer->queueHead > buffer->head); // No queue to cancel
+  buffer->queueHead = buffer->head;
+  buffer->index = buffer->head;
 }
 
 void Undo(CommandBuffer* cmdBuffer, LevelData* level){
@@ -115,59 +171,26 @@ void Undo(CommandBuffer* cmdBuffer, LevelData* level){
   AnyCommand cmd = cmdBuffer->allCommands[cmdBuffer->index];
   assert(cmd.command.type != CMD_TYPE::NONE);
   uint32_t timestamp = cmd.command.timestamp;
-  switch(cmd.command.type){
-    case CMD_TYPE::NONE:
-      break;
-    case CMD_TYPE::MOVE:{
-      MoveCommand mv = cmd.move;
-      mv.entity->x -= mv.xDir;      
-      mv.entity->y -= mv.yDir;
-      mv.entity->progress_01 = 1;
-      }
-       break;
-    case CMD_TYPE::ROTATE:{
-      RotateCommand rotate = cmd.rotate;
-      if(!HasBehaviour(rotate.entity, CAN_ROTATE)){
-        break;
-      }
-      rotate.entity->facing_current = rotate.from;
-      rotate.entity->progress_01 = 1;
-      break;
-      }
-    case CMD_TYPE::MODIFY_BEHAVIOUR: {
-        ModifyBehaviourCommand modify = cmd.modify;
-        if(modify.mode == ModifyBehaviourCommand::ADD){
-          RemoveBehaviour(modify.entity, modify.flag); 
-        }
-        else{
-          AddBehaviour(modify.entity, modify.flag); 
-        }
-        break;
-      }
-      case CMD_TYPE::ADD:{
-          AddCommand* add = &cmd.add;
-          RemoveEntity(add->x, add->y, level);
-          break;          
-        }
-      case CMD_TYPE::REMOVE:{
-          RemoveCommand* remove = &cmd.remove;
-          AddEntity(remove->storedID, remove->x, remove->y, level);
-          Entity* entity = GetEntity(level, remove->x, remove->y);
-          SetBehaviour(entity, remove->storedBehaviour); 
-          break;            
-        }
-      case CMD_TYPE::SWAP_ACTIVE:{
-          SwapActiveEntityCommand* swap = &cmd.swap_active;
-          *swap->value_to_change = swap->index_previous;
-          break;
-        }
-      }
+  Revert(cmd, level, cmdBuffer);
 
   if(cmdBuffer->index > 0){
     if(cmdBuffer->allCommands[cmdBuffer->index - 1].command.timestamp == timestamp){
       Undo(cmdBuffer, level);
     } 
   }
+}
+
+void UndoTo(CommandBuffer* cmdBuffer, LevelData* level, int index){
+  assert(cmdBuffer->index > index);
+  assert(index >= 0);
+
+  while (cmdBuffer->index > index){
+    cmdBuffer->index--;
+    AnyCommand command = cmdBuffer->allCommands[cmdBuffer->index];
+    Revert(command, level, cmdBuffer);
+  }
+  cmdBuffer->queueHead = cmdBuffer->index;
+  cmdBuffer->head = cmdBuffer->index;
 }
 
 void Redo(CommandBuffer* cmdBuffer, LevelData* level){

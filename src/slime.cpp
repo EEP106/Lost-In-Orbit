@@ -57,7 +57,7 @@ void MoveSlime(Memory::Arena* arena_scratch, LevelData* level, CommandBuffer* co
   for (int i = 0; i < slimeCount; i++){
     if (slimeMovableStates[i] == SlimeMovable::Pushed) continue;
     Entity* slime = slimeBuffer[i];
-    if (IsWalkable(slime->x + xDir, slime->y + yDir, level)) continue; 
+    if (!IsSolid(slime->x + xDir, slime->y + yDir, level)) continue; 
     slimeMovableStates[i] = SlimeMovable::Blocked;
   }
 
@@ -167,4 +167,45 @@ bool TryShuffle(LevelData* level, CommandBuffer* command, int xDir, int yDir){
   }
 
   return hasShuffled;
+}
+
+bool CheckAllEntitiesSupported(Memory::Arena* arena_scratch, LevelData* level){
+  bool* supportedBuffer = ALLOC_ARRAY(arena_scratch, bool, level->entityCount);
+
+  for (int i = 0; i < level->entityCount; i++){
+    Entity* entity = &level->entityBuffer[i];
+    bool isWalkable = IsWalkable(entity->x, entity->y, level);
+    supportedBuffer[i] = isWalkable;
+  }
+
+  bool changed = true;
+  while (changed){
+    changed = false;
+    for (int i = 0; i < level->entityCount; i++){
+      if (supportedBuffer[i]) continue;
+      
+      Entity* entity = &level->entityBuffer[i];
+      for (int d = 0; d < 4; d++){
+        Direction dir = (Direction)d;
+        int xPos, yPos;
+        XYFromDirection(dir, xPos, yPos);
+        xPos += entity->x;
+        yPos += entity->y;
+
+        int connectedEntityIndex;
+        Entity* connectedEntity = GetEntity(level, xPos, yPos, &connectedEntityIndex);
+        if (connectedEntity == nullptr) continue;
+        if (supportedBuffer[connectedEntityIndex]){
+          supportedBuffer[i] = true;
+          changed = true;
+        }
+      }
+    }
+  }
+
+  for (int i = 0; i < level->entityCount; i++){
+    if (!supportedBuffer[i]) return false;
+  }
+
+  return true;
 }

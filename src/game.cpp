@@ -402,11 +402,16 @@ extern "C" {
       case QueueActionResult::Rotate:
       Flush(gameplay->commandBuffer, level);
       break;
-      case QueueActionResult::Move:
+      case QueueActionResult::Move:{
+      int preFlushIndex = gameplay->commandBuffer->index;
       Flush(gameplay->commandBuffer, level);
       gameplay->commandBuffer->timestamp++;
       gameplay->input_buffer_read_count++;
-      break;
+
+      if (!CheckAllEntitiesSupported(arena_scratch, level)){
+        UndoTo(gameplay->commandBuffer, level, preFlushIndex);
+      }
+      break;}
       case QueueActionResult::MoveFailed:
       gameplay->input_buffer_read_count++;
       break;

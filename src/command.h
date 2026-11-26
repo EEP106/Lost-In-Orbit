@@ -144,5 +144,7 @@ void ResetCommandBuffer(CommandBuffer* buffer);
 void Push(CommandBuffer* cmdBuffer, AnyCommand cmd, LevelData* level);
 void Queue(CommandBuffer* cmdBuffer, AnyCommand cmd);
 void Flush(CommandBuffer* cmdBuffer, LevelData* level);
+void CancleQueue(CommandBuffer* cmdBuffer, LevelData* level);
 void Undo(CommandBuffer* cmdBuffer, LevelData* level);
+void UndoTo(CommandBuffer* cmdBuffer, LevelData* level, int index);
 void Redo(CommandBuffer* cmdBuffer, LevelData* level);
