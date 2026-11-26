@@ -287,19 +287,19 @@ extern "C" {
     bool can_accept_input =! are_entities_acting && gameplay->input_buffer_read_count == gameplay->input_buffer_write_count;
     if (can_accept_input)
     {
-      if(KeyPressed(input,SDL_SCANCODE_RIGHT) || KeyHeld_ForTime(input,SDL_SCANCODE_RIGHT, (1 / move_speed) * 1.15)){
+      if(KeyPressed(input,SDL_SCANCODE_RIGHT) || KeyHeld_ForTime(input,SDL_SCANCODE_RIGHT, (1 / move_speed) * 1)){
         ResetKeyHeldTime(input, SDL_SCANCODE_RIGHT);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {1, 0};
       }
-      else if(KeyPressed(input,SDL_SCANCODE_LEFT) || KeyHeld_ForTime(input,SDL_SCANCODE_LEFT, (1 / move_speed) * 1.15)){
+      else if(KeyPressed(input,SDL_SCANCODE_LEFT) || KeyHeld_ForTime(input,SDL_SCANCODE_LEFT, (1 / move_speed) * 1)){
         ResetKeyHeldTime(input, SDL_SCANCODE_LEFT);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {-1, 0};
       }
-      else if(KeyPressed(input,SDL_SCANCODE_UP) || KeyHeld_ForTime(input,SDL_SCANCODE_UP, (1 / move_speed) * 1.15)){
+      else if(KeyPressed(input,SDL_SCANCODE_UP) || KeyHeld_ForTime(input,SDL_SCANCODE_UP, (1 / move_speed) * 1)){
         ResetKeyHeldTime(input, SDL_SCANCODE_UP);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {0, -1};
       }
-      else if(KeyPressed(input,SDL_SCANCODE_DOWN) || KeyHeld_ForTime(input,SDL_SCANCODE_DOWN, (1 / move_speed) * 1.15)){
+      else if(KeyPressed(input,SDL_SCANCODE_DOWN) || KeyHeld_ForTime(input,SDL_SCANCODE_DOWN, (1 / move_speed) * 1)){
         ResetKeyHeldTime(input, SDL_SCANCODE_DOWN);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {0, 1};
       }
