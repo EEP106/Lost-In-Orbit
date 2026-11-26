@@ -25,6 +25,13 @@ enum class SPRITE_ID{
   Menu_Front,
   Button_Basic,
   Alien_Sprite,
+  Alien_Walk_Right,
+  Alien_Walk_Left,
+  Alien_Walk_Down,
+  Alien_Idle_Right,
+  Alien_Idle_Left,
+  Alien_Idle_Up,
+  Alien_Idle_Down,
   test_entity,
   Background_Asteroid_1,
   Background_Asteroid_2

@@ -18,17 +18,15 @@ static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Rock, "assets/sprites/rock.png", 256, 328},
   //{SPRITE_ID::Medusa_Rotate, "assets/sprites/medusa_rotate.png", 12, 24, 8, 1},
   /*{
-    .id = SPRITE_ID::Medusa_Idle_Left,
-    .path = "assets/sprites/medusa_idle_left.png",
-    .pivot_x = 12,
-    .pivot_y = 24,
-    .tileset_cell_count_x = 4,
-    .tileset_cell_count_y = 1,
-    .framerate = 8
+  .id = SPRITE_ID::Medusa_Idle_Left,
+  .path = "assets/sprites/medusa_idle_left.png",
+  .pivot_x = 12,
+  .pivot_y = 24,
+  .tileset_cell_count_x = 4,
+  .tileset_cell_count_y = 1,
+  .framerate = 8
   },
   */
-  //{SPRITE_ID::Medusa_Idle_Front, "assets/sprites/medusa_idle_front.png", 12, 24, 4, 1, 8},
-  //{SPRITE_ID::Medusa_Idle_Back, "assets/sprites/medusa_idle_back.png", 12, 24, 4, 1, 8},
   {SPRITE_ID::Slime, "assets/sprites/slime.png"},
   {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 256, 128},
   {SPRITE_ID::black_1x1, "assets/sprites/1x1_black.png",0,0},
@@ -44,81 +42,109 @@ static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Menu_Front, "assets/sprites/mainmenu_front.png"},
   {SPRITE_ID::Button_Basic, "assets/sprites/basic_button.png",0,0,3,3},
   {SPRITE_ID::Alien_Sprite, "assets/sprites/Test_Entity.png",256,872},
+  {SPRITE_ID::Alien_Idle_Right, "assets/sprites/Alien_Idle_Right.png",256,872},
+  {SPRITE_ID::Alien_Idle_Left, "assets/sprites/Alien_Idle_Left.png",256,872},
+  {SPRITE_ID::Alien_Idle_Up, "assets/sprites/Alien_Idle_Up.png",256,872},
+  {SPRITE_ID::Alien_Idle_Down, "assets/sprites/Alien_Idle_Down.png",256,872},
+  {SPRITE_ID::Alien_Walk_Right, "assets/sprites/Alien_Walk_Right.png", 256, 872, 4, 1, 2},
+  {SPRITE_ID::Alien_Walk_Left, "assets/sprites/Alien_Walk_Left.png", 256, 872, 4, 1, 2},
+  {SPRITE_ID::Alien_Walk_Down, "assets/sprites/Alien_Walk_Down.png", 256, 872, 4, 1, 2},
   {SPRITE_ID::test_entity, "assets/sprites/Test_Entity.png",256,1000},
   {SPRITE_ID::Background_Asteroid_1, "assets/sprites/Background_Asteroid_1.png"},
   {SPRITE_ID::Background_Asteroid_2, "assets/sprites/Background_Asteroid_2.png"},
 };
+
+static SpriteRenderInfo WalkFrame(Entity* entity, Sprite* sprite, float cycles = 1.0f){
+  int count = GetSpriteCount(sprite);
+  int frame = (int)(entity->progress_01 * cycles * count) % count;
+  return {frame, sprite};
+}
+
 SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer, const uint64_t* ticks_total){  
   /*
   if(entity->id == ENTITY_ID::PLAYER && entity->action == Actions::ROTATING){
-    Sprite* spritesheet = GetSprite(SPRITE_ID::Medusa_Rotate, spritebuffer);
-    
-    int start = 0;
-    int end = 0;
-    switch(entity->facing_previous){
-      case Direction::RIGHT:
-      start = 6;
-      break;
-      case Direction::LEFT:
-      start = 2;
-      break;
-      case Direction::UP:
-      start = 4;
-      break;
-      case Direction::DOWN:
-      start = 0;
-      break;
-    }
-    
-    switch(entity->facing_current){
-      case Direction::RIGHT:
-      end = 6;
-      break;
-      case Direction::LEFT:
-      end = 2;
-      break;
-      case Direction::UP:
-      end = 4;
-      break;
-      case Direction::DOWN:
-      end = 0;
-      break;
-    }
-    
-    int sprite_count = GetSpriteCount(spritesheet);
-    int forward = ((end - start) % sprite_count + sprite_count) % sprite_count;
-    int backward = sprite_count - forward;
-    end = (forward <= backward) ? (start + forward) : (start - backward);
-    int current_frame = (((int)lerp(start, end, entity->progress_01) + sprite_count) % sprite_count);
-    return {current_frame, spritesheet};
+  Sprite* spritesheet = GetSprite(SPRITE_ID::Medusa_Rotate, spritebuffer);
+  
+  int start = 0;
+  int end = 0;
+  switch(entity->facing_previous){
+  case Direction::RIGHT:
+  start = 6;
+  break;
+  case Direction::LEFT:
+  start = 2;
+  break;
+  case Direction::UP:
+  start = 4;
+  break;
+  case Direction::DOWN:
+  start = 0;
+  break;
+  }
+  
+  switch(entity->facing_current){
+  case Direction::RIGHT:
+  end = 6;
+  break;
+  case Direction::LEFT:
+  end = 2;
+  break;
+  case Direction::UP:
+  end = 4;
+  break;
+  case Direction::DOWN:
+  end = 0;
+  break;
+  }
+  
+  int sprite_count = GetSpriteCount(spritesheet);
+  int forward = ((end - start) % sprite_count + sprite_count) % sprite_count;
+  int backward = sprite_count - forward;
+  end = (forward <= backward) ? (start + forward) : (start - backward);
+  int current_frame = (((int)lerp(start, end, entity->progress_01) + sprite_count) % sprite_count);
+  return {current_frame, spritesheet};
   }
   */
   switch (entity->id) {
     case ENTITY_ID::PLAYER:{
-
-      /*
+      
       Sprite* sprite = nullptr;
       int frame = 0;
       switch (entity->facing_current) {
         case Direction::RIGHT:
-        sprite = GetSprite(SPRITE_ID::Medusa_Idle_Left, spritebuffer);
-        frame = (int)((*ticks_total * sprite->framerate) / FPS % GetSpriteCount(sprite));
-        return {frame, sprite, true};
+        if(entity->action == Actions::MOVING){
+          sprite = GetSprite(SPRITE_ID::Alien_Walk_Right, spritebuffer);
+          return WalkFrame(entity, sprite);
+        }
+        sprite = GetSprite(SPRITE_ID::Alien_Idle_Right, spritebuffer);
+        return {sprite};
+        
         case Direction::LEFT:
-        sprite = GetSprite(SPRITE_ID::Medusa_Idle_Left, spritebuffer);
-        frame = (int)((*ticks_total * sprite->framerate) / FPS % GetSpriteCount(sprite));
-        return {frame, sprite};
-        case Direction::DOWN:
-        sprite = GetSprite(SPRITE_ID::Medusa_Idle_Back, spritebuffer);
-        frame = (int)((*ticks_total * sprite->framerate) / FPS % GetSpriteCount(sprite));
-        return {frame, sprite};
+        if(entity->action == Actions::MOVING){
+          sprite = GetSprite(SPRITE_ID::Alien_Walk_Left, spritebuffer);
+          return WalkFrame(entity, sprite);
+        }
+        sprite = GetSprite(SPRITE_ID::Alien_Idle_Left, spritebuffer);
+        return {sprite};
+        
+        case Direction::DOWN: //Up and down is flipped
+        if(entity->action == Actions::MOVING){
+          sprite = GetSprite(SPRITE_ID::Alien_Idle_Up, spritebuffer);
+          return WalkFrame(entity, sprite);
+        }
+        sprite = GetSprite(SPRITE_ID::Alien_Idle_Up, spritebuffer);
+        return {sprite};
+        
         case Direction::UP:
-        sprite = GetSprite(SPRITE_ID::Medusa_Idle_Front, spritebuffer);
-        frame = (int)((*ticks_total * sprite->framerate) / FPS % GetSpriteCount(sprite));
-        return {frame, sprite};
+        if(entity->action == Actions::MOVING){
+          sprite = GetSprite(SPRITE_ID::Alien_Walk_Down, spritebuffer);
+          return WalkFrame(entity, sprite);
+        }
+        sprite = GetSprite(SPRITE_ID::Alien_Idle_Down, spritebuffer);
+        return {sprite};
       }
-        */
-    return GetSprite(SPRITE_ID::Alien_Sprite, spritebuffer);
+      
+      return GetSprite(SPRITE_ID::Alien_Sprite, spritebuffer);
     } 
     case ENTITY_ID::ROCK:
     return GetSprite(SPRITE_ID::Rock, spritebuffer);
@@ -156,8 +182,8 @@ Sprite* GetSpriteFromID(ENTITY_ID id, Sprite* spriteBuffer){
     case ENTITY_ID::SLIME:
     sprite_to_return = &spriteBuffer[(int)SPRITE_ID::Slime];
     break;
-    }
-
+  }
+  
   if(sprite_to_return == nullptr || sprite_to_return->texture == nullptr){
     sprite_to_return = &spriteBuffer[(int)SPRITE_ID::Fallback];
   }

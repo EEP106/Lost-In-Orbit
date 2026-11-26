@@ -125,6 +125,7 @@ extern "C" {
   static bool g_pause_ready = false;
   static float g_pause_w = SCREEN_WIDTH;
   static float g_pause_h = SCREEN_HEIGHT;
+  static const int SPEED_UP_MULTIPLIER = 2;
   
   static void InitPauseButtons(GameData* data){
     if(g_pause_ready) return;
@@ -256,6 +257,8 @@ extern "C" {
       StartLevel(gameplay, arena_commands, arena_entities);
       return;
     }
+    float speed_factor = input->keys_current[SDL_SCANCODE_SPACE] ? (float)SPEED_UP_MULTIPLIER : 1.0f;
+    float move_speed = MOVE_SPEED * speed_factor;
     
     bool are_entities_acting = false;
     LevelData *level = GetCurrentLevel(gameplay);
@@ -284,19 +287,19 @@ extern "C" {
     bool can_accept_input =! are_entities_acting && gameplay->input_buffer_read_count == gameplay->input_buffer_write_count;
     if (can_accept_input)
     {
-      if(KeyPressed(input,SDL_SCANCODE_RIGHT) || KeyHeld_ForTime(input,SDL_SCANCODE_RIGHT, (1 / MOVE_SPEED) * 1.15)){
+      if(KeyPressed(input,SDL_SCANCODE_RIGHT) || KeyHeld_ForTime(input,SDL_SCANCODE_RIGHT, (1 / move_speed) * 1.15)){
         ResetKeyHeldTime(input, SDL_SCANCODE_RIGHT);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {1, 0};
       }
-      else if(KeyPressed(input,SDL_SCANCODE_LEFT) || KeyHeld_ForTime(input,SDL_SCANCODE_LEFT, (1 / MOVE_SPEED) * 1.15)){
+      else if(KeyPressed(input,SDL_SCANCODE_LEFT) || KeyHeld_ForTime(input,SDL_SCANCODE_LEFT, (1 / move_speed) * 1.15)){
         ResetKeyHeldTime(input, SDL_SCANCODE_LEFT);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {-1, 0};
       }
-      else if(KeyPressed(input,SDL_SCANCODE_UP) || KeyHeld_ForTime(input,SDL_SCANCODE_UP, (1 / MOVE_SPEED) * 1.15)){
+      else if(KeyPressed(input,SDL_SCANCODE_UP) || KeyHeld_ForTime(input,SDL_SCANCODE_UP, (1 / move_speed) * 1.15)){
         ResetKeyHeldTime(input, SDL_SCANCODE_UP);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {0, -1};
       }
-      else if(KeyPressed(input,SDL_SCANCODE_DOWN) || KeyHeld_ForTime(input,SDL_SCANCODE_DOWN, (1 / MOVE_SPEED) * 1.15)){
+      else if(KeyPressed(input,SDL_SCANCODE_DOWN) || KeyHeld_ForTime(input,SDL_SCANCODE_DOWN, (1 / move_speed) * 1.15)){
         ResetKeyHeldTime(input, SDL_SCANCODE_DOWN);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {0, 1};
       }
@@ -339,7 +342,7 @@ extern "C" {
         case Actions::NONE:
         continue;
         case Actions::MOVING:
-        entity->progress_01 += MOVE_SPEED * dt;
+        entity->progress_01 += move_speed * dt;
         break;
         case Actions::ROTATING:
         // Change the variable after progress_01 for the speed of rotating (higher is faster)
@@ -423,7 +426,9 @@ extern "C" {
     // "Freezes" the game when paused my making animations and movement of background assets pause
     bool is_paused = data->scene_current == SCENE_TYPES::GAME && gameplay->paused;
     if(!is_paused){
-      *data->ticks_total += 1;
+      bool speeding_up = data->scene_current == SCENE_TYPES::GAME &&
+      data->input.keys_current[SDL_SCANCODE_SPACE];
+      *data->ticks_total += speeding_up ? SPEED_UP_MULTIPLIER : 1;
     }
     
     if(KeyPressed(&data->input, SDL_SCANCODE_F2)){
