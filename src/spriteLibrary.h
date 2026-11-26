@@ -27,6 +27,7 @@ enum class SPRITE_ID{
   Alien_Sprite,
   Alien_Walk_Right,
   Alien_Walk_Left,
+  Alien_Walk_Up,
   Alien_Walk_Down,
   Alien_Idle_Right,
   Alien_Idle_Left,

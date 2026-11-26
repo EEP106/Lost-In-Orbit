@@ -42,12 +42,13 @@ static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Menu_Front, "assets/sprites/mainmenu_front.png"},
   {SPRITE_ID::Button_Basic, "assets/sprites/basic_button.png",0,0,3,3},
   {SPRITE_ID::Alien_Sprite, "assets/sprites/Test_Entity.png",256,872},
-  {SPRITE_ID::Alien_Idle_Right, "assets/sprites/Alien_Idle_Right.png",256,872},
-  {SPRITE_ID::Alien_Idle_Left, "assets/sprites/Alien_Idle_Left.png",256,872},
-  {SPRITE_ID::Alien_Idle_Up, "assets/sprites/Alien_Idle_Up.png",256,872},
-  {SPRITE_ID::Alien_Idle_Down, "assets/sprites/Alien_Idle_Down.png",256,872},
+  {SPRITE_ID::Alien_Idle_Right, "assets/sprites/Alien_Idle_Right.png",256,872,2,1,2},
+  {SPRITE_ID::Alien_Idle_Left, "assets/sprites/Alien_Idle_Left.png",256,872,2,1,2},
+  {SPRITE_ID::Alien_Idle_Up, "assets/sprites/Alien_Idle_Up.png",256,872,2,1,2},
+  {SPRITE_ID::Alien_Idle_Down, "assets/sprites/Alien_Idle_Down.png",256,872,2,1,2},
   {SPRITE_ID::Alien_Walk_Right, "assets/sprites/Alien_Walk_Right.png", 256, 872, 4, 1, 2},
   {SPRITE_ID::Alien_Walk_Left, "assets/sprites/Alien_Walk_Left.png", 256, 872, 4, 1, 2},
+  {SPRITE_ID::Alien_Walk_Up, "assets/sprites/Alien_Walk_Up.png", 256, 872, 4, 1, 2},
   {SPRITE_ID::Alien_Walk_Down, "assets/sprites/Alien_Walk_Down.png", 256, 872, 4, 1, 2},
   {SPRITE_ID::test_entity, "assets/sprites/Test_Entity.png",256,1000},
   {SPRITE_ID::Background_Asteroid_1, "assets/sprites/Background_Asteroid_1.png"},
@@ -57,6 +58,15 @@ static const SpriteDataEntry all_sprite_data[] = {
 static SpriteRenderInfo WalkFrame(Entity* entity, Sprite* sprite, float cycles = 1.0f){
   int count = GetSpriteCount(sprite);
   int frame = (int)(entity->progress_01 * cycles * count) % count;
+  return {frame, sprite};
+}
+
+static SpriteRenderInfo IdleFrame(Sprite* sprite, const uint64_t* ticks_total){
+  int count = GetSpriteCount(sprite);
+  int frame = 0;
+  if(count > 1 && sprite->framerate > 0){
+    frame = (int)((*ticks_total * sprite->framerate) / FPS % count);
+  }
   return {frame, sprite};
 }
 
@@ -117,7 +127,7 @@ SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer,
           return WalkFrame(entity, sprite);
         }
         sprite = GetSprite(SPRITE_ID::Alien_Idle_Right, spritebuffer);
-        return {sprite};
+        return IdleFrame(sprite, ticks_total);
         
         case Direction::LEFT:
         if(entity->action == Actions::MOVING){
@@ -125,15 +135,15 @@ SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer,
           return WalkFrame(entity, sprite);
         }
         sprite = GetSprite(SPRITE_ID::Alien_Idle_Left, spritebuffer);
-        return {sprite};
+        return IdleFrame(sprite, ticks_total);
         
         case Direction::DOWN: //Up and down is flipped
         if(entity->action == Actions::MOVING){
-          sprite = GetSprite(SPRITE_ID::Alien_Idle_Up, spritebuffer);
+          sprite = GetSprite(SPRITE_ID::Alien_Walk_Up, spritebuffer);
           return WalkFrame(entity, sprite);
         }
         sprite = GetSprite(SPRITE_ID::Alien_Idle_Up, spritebuffer);
-        return {sprite};
+        return IdleFrame(sprite, ticks_total);
         
         case Direction::UP:
         if(entity->action == Actions::MOVING){
@@ -141,7 +151,7 @@ SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer,
           return WalkFrame(entity, sprite);
         }
         sprite = GetSprite(SPRITE_ID::Alien_Idle_Down, spritebuffer);
-        return {sprite};
+        return IdleFrame(sprite, ticks_total);
       }
       
       return GetSprite(SPRITE_ID::Alien_Sprite, spritebuffer);
