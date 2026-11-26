@@ -29,10 +29,21 @@
 // bool to control whether walkable outlines are shown
 static bool g_show_walkable_outlines = false;
 
+// Every level needs it's path here
 static const char* LEVEL_PATHS[] = {
   "assets/levels/level_Test.tmj",
   "assets/levels/level_01.tmj",
   "assets/levels/level_02.tmj",
+  "assets/levels/level_03.tmj",
+  "assets/levels/level_04.tmj",
+};
+// Every level need a level text or it crashes
+static const char* LEVEL_TEXTS[] = {
+  "Test level", // level_Test
+  "W A S D to move Z to undo R to reset", // level_01
+  "Slime sticks to you", // level_02
+  "Use the slime to cross gaps", // level_03
+  "Level 4", // level_04
 };
 
 extern "C" {
@@ -571,6 +582,12 @@ extern "C" {
           DrawWalkableOutlines(data, renderer);
         }
         RenderEntities(data, renderer);
+        
+        int level_index = data->scenes.gameplay.currentLevelIndex;
+        int text_count = (int)(sizeof(LEVEL_TEXTS) / sizeof(LEVEL_TEXTS[0]));
+        if(level_index >= 0 && level_index < text_count && !IsStringEmpty(LEVEL_TEXTS[level_index])){
+          RenderText(&data->font, LEVEL_TEXTS[level_index], renderer, nullptr, w / 2.0f, h * 0.1f, Alignment::Centered);
+        }
         if(data->scenes.gameplay.paused){
           DrawPauseMenu(data, renderer, (float)w, (float)h);
         }
