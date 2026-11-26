@@ -4,6 +4,18 @@
 #include "movement.h"
 #include "command.h"
 
+bool EntityHasMoveQueued(CommandBuffer* command, Entity* entity){
+  for(int i = command->index; i < command->queueHead; i++){
+    AnyCommand cmd = command->allCommands[i];
+    if (cmd.command.type != CMD_TYPE::MOVE) continue; 
+
+    MoveCommand move = cmd.move;
+    if (move.entity == entity) return true;
+  }
+
+  return false;
+}
+
 void MoveSlime(Memory::Arena* arena_scratch, LevelData* level, CommandBuffer* command, int xDir, int yDir){
   int slimeCount = 0;
   for (int i = 0; i < level->entityCount; i++){
@@ -129,7 +141,7 @@ void MoveSlime(Memory::Arena* arena_scratch, LevelData* level, CommandBuffer* co
       MoveCommand move(slime, xDir, yDir);
       Queue(command, move);
     }
-    else{
+    else if(EntityHasMoveQueued(command, entityInFront)){
       TryMove(slime, level, command, xDir, yDir, 1);
     }
   }
