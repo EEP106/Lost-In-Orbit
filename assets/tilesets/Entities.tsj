@@ -13,16 +13,20 @@
  "tileheight":1024,
  "tiles":[
         {
+         "height":1024,
          "id":0,
          "image":"..\/sprites\/Alien_Idle_Down.png",
          "imageheight":1024,
-         "imagewidth":512,
+         "imagewidth":1024,
          "properties":[
                 {
                  "name":"entity_name",
                  "type":"string",
                  "value":"alien"
-                }]
+                }],
+         "width":512,
+         "x":0,
+         "y":0
         }, 
         {
          "id":1,

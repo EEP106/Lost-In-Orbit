@@ -36,14 +36,26 @@ static const char* LEVEL_PATHS[] = {
   "assets/levels/level_02.tmj",
   "assets/levels/level_03.tmj",
   "assets/levels/level_04.tmj",
+  "assets/levels/level_05.tmj",
+  "assets/levels/level_06.tmj",
+  "assets/levels/level_07.tmj",
+  "assets/levels/level_08.tmj",
+  "assets/levels/level_09.tmj",
+  "assets/levels/level_10.tmj",
 };
 // Every level need a level text or it crashes
 static const char* LEVEL_TEXTS[] = {
   "Test level", // level_Test
-  "W A S D to move Z to undo R to reset", // level_01
+  "Arrow keys to move Z to undo R to reset", // level_01
   "Slime sticks to you", // level_02
   "Use the slime to cross gaps", // level_03
-  "Level 4", // level_04
+  "Use the enviroment to move inside the slime", // level_04
+  "If slime is not connected to another slime it will detatch", // level_05
+  " ", // level_06
+  " ", // level_07
+  " ", // level_08
+  " ", // level_09
+  " ", // level_10
 };
 
 extern "C" {

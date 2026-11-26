@@ -12,10 +12,10 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 12, 12, 12, 12, 12, 12, 12, 12, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -134,8 +134,83 @@
  "tileheight":512,
  "tilesets":[
         {
+         "columns":0,
          "firstgid":1,
-         "source":"..\/tilesets\/Entities.tsj"
+         "grid":
+            {
+             "height":1,
+             "orientation":"orthogonal",
+             "width":1
+            },
+         "margin":0,
+         "name":"Entities",
+         "spacing":0,
+         "tilecount":5,
+         "tileheight":1024,
+         "tiles":[
+                {
+                 "height":1024,
+                 "id":0,
+                 "image":"..\/sprites\/Alien_Idle_Down.png",
+                 "imageheight":1024,
+                 "imagewidth":1024,
+                 "properties":[
+                        {
+                         "name":"entity_name",
+                         "type":"string",
+                         "value":"alien"
+                        }],
+                 "width":512,
+                 "x":0,
+                 "y":0
+                }, 
+                {
+                 "id":1,
+                 "image":"..\/sprites\/player.png",
+                 "imageheight":16,
+                 "imagewidth":16,
+                 "properties":[
+                        {
+                         "name":"entity_name",
+                         "type":"string",
+                         "value":"demon"
+                        }]
+                }, 
+                {
+                 "height":512,
+                 "id":2,
+                 "image":"..\/sprites\/rock.png",
+                 "imageheight":512,
+                 "imagewidth":512,
+                 "properties":[
+                        {
+                         "name":"entity_name",
+                         "type":"string",
+                         "value":"rock"
+                        }],
+                 "width":512,
+                 "x":2,
+                 "y":3
+                }, 
+                {
+                 "id":3,
+                 "image":"..\/sprites\/test_entity.png",
+                 "imageheight":1024,
+                 "imagewidth":512,
+                 "properties":[
+                        {
+                         "name":"entity_name",
+                         "type":"string",
+                         "value":"test_entity"
+                        }]
+                }, 
+                {
+                 "id":4,
+                 "image":"..\/sprites\/slime.png",
+                 "imageheight":512,
+                 "imagewidth":512
+                }],
+         "tilewidth":512
         }, 
         {
          "firstgid":6,
