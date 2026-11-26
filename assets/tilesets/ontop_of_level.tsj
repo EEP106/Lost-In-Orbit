@@ -10,19 +10,15 @@
  "spacing":0,
  "tilecount":1,
  "tiledversion":"1.12.2",
- "tileheight":16,
+ "tileheight":512,
  "tiles":[
         {
-         "height":16,
          "id":0,
          "image":"..\/sprites\/goal.png",
-         "imageheight":16,
-         "imagewidth":128,
-         "width":16,
-         "x":0,
-         "y":0
+         "imageheight":512,
+         "imagewidth":512
         }],
- "tilewidth":16,
+ "tilewidth":512,
  "type":"tileset",
  "version":"1.10"
 }

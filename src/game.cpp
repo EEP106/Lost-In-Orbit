@@ -29,9 +29,21 @@
 // bool to control whether walkable outlines are shown
 static bool g_show_walkable_outlines = false;
 
+// Every level needs it's path here
 static const char* LEVEL_PATHS[] = {
+  "assets/levels/level_Test.tmj",
   "assets/levels/level_01.tmj",
   "assets/levels/level_02.tmj",
+  "assets/levels/level_03.tmj",
+  "assets/levels/level_04.tmj",
+};
+// Every level need a level text or it crashes
+static const char* LEVEL_TEXTS[] = {
+  "Test level", // level_Test
+  "W A S D to move Z to undo R to reset", // level_01
+  "Slime sticks to you", // level_02
+  "Use the slime to cross gaps", // level_03
+  "Level 4", // level_04
 };
 
 extern "C" {
@@ -125,6 +137,7 @@ extern "C" {
   static bool g_pause_ready = false;
   static float g_pause_w = SCREEN_WIDTH;
   static float g_pause_h = SCREEN_HEIGHT;
+  static const int SPEED_UP_MULTIPLIER = 2;
   
   static void InitPauseButtons(GameData* data){
     if(g_pause_ready) return;
@@ -256,6 +269,8 @@ extern "C" {
       StartLevel(gameplay, arena_commands, arena_entities);
       return;
     }
+    float speed_factor = input->keys_current[SDL_SCANCODE_SPACE] ? (float)SPEED_UP_MULTIPLIER : 1.0f;
+    float move_speed = MOVE_SPEED * speed_factor;
     
     bool are_entities_acting = false;
     LevelData *level = GetCurrentLevel(gameplay);
@@ -284,19 +299,19 @@ extern "C" {
     bool can_accept_input =! are_entities_acting && gameplay->input_buffer_read_count == gameplay->input_buffer_write_count;
     if (can_accept_input)
     {
-      if(KeyPressed(input,SDL_SCANCODE_RIGHT) || KeyHeld_ForTime(input,SDL_SCANCODE_RIGHT, (1 / MOVE_SPEED) * 1.15)){
+      if(KeyPressed(input,SDL_SCANCODE_RIGHT) || KeyHeld_ForTime(input,SDL_SCANCODE_RIGHT, (1 / move_speed) * 1)){
         ResetKeyHeldTime(input, SDL_SCANCODE_RIGHT);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {1, 0};
       }
-      else if(KeyPressed(input,SDL_SCANCODE_LEFT) || KeyHeld_ForTime(input,SDL_SCANCODE_LEFT, (1 / MOVE_SPEED) * 1.15)){
+      else if(KeyPressed(input,SDL_SCANCODE_LEFT) || KeyHeld_ForTime(input,SDL_SCANCODE_LEFT, (1 / move_speed) * 1)){
         ResetKeyHeldTime(input, SDL_SCANCODE_LEFT);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {-1, 0};
       }
-      else if(KeyPressed(input,SDL_SCANCODE_UP) || KeyHeld_ForTime(input,SDL_SCANCODE_UP, (1 / MOVE_SPEED) * 1.15)){
+      else if(KeyPressed(input,SDL_SCANCODE_UP) || KeyHeld_ForTime(input,SDL_SCANCODE_UP, (1 / move_speed) * 1)){
         ResetKeyHeldTime(input, SDL_SCANCODE_UP);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {0, -1};
       }
-      else if(KeyPressed(input,SDL_SCANCODE_DOWN) || KeyHeld_ForTime(input,SDL_SCANCODE_DOWN, (1 / MOVE_SPEED) * 1.15)){
+      else if(KeyPressed(input,SDL_SCANCODE_DOWN) || KeyHeld_ForTime(input,SDL_SCANCODE_DOWN, (1 / move_speed) * 1)){
         ResetKeyHeldTime(input, SDL_SCANCODE_DOWN);
         gameplay->input_buffer[gameplay->input_buffer_write_count++ % gameplay->input_buffer_capacity] = {0, 1};
       }
@@ -339,10 +354,11 @@ extern "C" {
         case Actions::NONE:
         continue;
         case Actions::MOVING:
-        entity->progress_01 += MOVE_SPEED * dt;
+        entity->progress_01 += move_speed * dt;
         break;
         case Actions::ROTATING:
-        entity->progress_01 += 8 * dt;
+        // Change the variable after progress_01 for the speed of rotating (higher is faster)
+        entity->progress_01 += 100 * dt;
         break;
       }
     }
@@ -427,7 +443,9 @@ extern "C" {
     // "Freezes" the game when paused my making animations and movement of background assets pause
     bool is_paused = data->scene_current == SCENE_TYPES::GAME && gameplay->paused;
     if(!is_paused){
-      *data->ticks_total += 1;
+      bool speeding_up = data->scene_current == SCENE_TYPES::GAME &&
+      data->input.keys_current[SDL_SCANCODE_SPACE];
+      *data->ticks_total += speeding_up ? SPEED_UP_MULTIPLIER : 1;
     }
     
     if(KeyPressed(&data->input, SDL_SCANCODE_F2)){
@@ -569,6 +587,12 @@ extern "C" {
           DrawWalkableOutlines(data, renderer);
         }
         RenderEntities(data, renderer);
+        
+        int level_index = data->scenes.gameplay.currentLevelIndex;
+        int text_count = (int)(sizeof(LEVEL_TEXTS) / sizeof(LEVEL_TEXTS[0]));
+        if(level_index >= 0 && level_index < text_count && !IsStringEmpty(LEVEL_TEXTS[level_index])){
+          RenderText(&data->font, LEVEL_TEXTS[level_index], renderer, nullptr, w / 2.0f, h * 0.1f, Alignment::Centered);
+        }
         if(data->scenes.gameplay.paused){
           DrawPauseMenu(data, renderer, (float)w, (float)h);
         }
