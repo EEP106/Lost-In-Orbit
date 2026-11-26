@@ -15,7 +15,7 @@ namespace EDITOR {
     }
     
     ImGui::SameLine();
-    if(ImGui::ImageButton("Medusa", (ImTextureID)GetSprite(SPRITE_ID::Medusa_Rotate, spriteBuffer)->texture, size)){
+    if(ImGui::ImageButton("Alien", (ImTextureID)GetSprite(SPRITE_ID::Alien_Sprite, spriteBuffer)->texture, size)){
      editor->object_to_place_id = ENTITY_ID::PLAYER;
     }
 
@@ -36,7 +36,7 @@ namespace EDITOR {
 
     SpriteRenderInfo preview;
     if(editor->object_to_place_id == ENTITY_ID::PLAYER){
-      preview = {0, GetSprite(SPRITE_ID::Medusa_Rotate, spriteBuffer)};   // first frame of her rotate sheet
+      preview = {0, GetSprite(SPRITE_ID::Alien_Sprite, spriteBuffer)};   // first frame of her rotate sheet
     }
     else{
       preview = GetSpriteFromID(editor->object_to_place_id, spriteBuffer);

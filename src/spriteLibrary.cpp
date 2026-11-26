@@ -15,9 +15,9 @@ const char* FALLBACK_PATH = "assets/sprites/fallback.png";
 
 static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Fallback, FALLBACK_PATH,8,8},
-  {SPRITE_ID::Rock, "assets/sprites/rock.png", 256, 412},
-  {SPRITE_ID::Medusa_Rotate, "assets/sprites/medusa_rotate.png", 12, 24, 8, 1},
-  {
+  {SPRITE_ID::Rock, "assets/sprites/rock.png", 256, 328},
+  //{SPRITE_ID::Medusa_Rotate, "assets/sprites/medusa_rotate.png", 12, 24, 8, 1},
+  /*{
     .id = SPRITE_ID::Medusa_Idle_Left,
     .path = "assets/sprites/medusa_idle_left.png",
     .pivot_x = 12,
@@ -26,10 +26,11 @@ static const SpriteDataEntry all_sprite_data[] = {
     .tileset_cell_count_y = 1,
     .framerate = 8
   },
-  {SPRITE_ID::Medusa_Idle_Front, "assets/sprites/medusa_idle_front.png", 12, 24, 4, 1, 8},
-  {SPRITE_ID::Medusa_Idle_Back, "assets/sprites/medusa_idle_back.png", 12, 24, 4, 1, 8},
+  */
+  //{SPRITE_ID::Medusa_Idle_Front, "assets/sprites/medusa_idle_front.png", 12, 24, 4, 1, 8},
+  //{SPRITE_ID::Medusa_Idle_Back, "assets/sprites/medusa_idle_back.png", 12, 24, 4, 1, 8},
   {SPRITE_ID::Slime, "assets/sprites/slime.png"},
-  {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 256, 256},
+  {SPRITE_ID::Dropshadow, "assets/sprites/dropshadow.png", 256, 128},
   {SPRITE_ID::black_1x1, "assets/sprites/1x1_black.png",0,0},
   {SPRITE_ID::titlescreen_background, "assets/sprites/titlescreen.png"},
   {SPRITE_ID::Space_Test_Background, "assets/sprites/Space_Test_Background.png"},
@@ -42,12 +43,13 @@ static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Menu_Middle, "assets/sprites/mainmenu_middle.png"},
   {SPRITE_ID::Menu_Front, "assets/sprites/mainmenu_front.png"},
   {SPRITE_ID::Button_Basic, "assets/sprites/basic_button.png",0,0,3,3},
+  {SPRITE_ID::Alien_Sprite, "assets/sprites/Test_Entity.png",256,872},
   {SPRITE_ID::test_entity, "assets/sprites/Test_Entity.png",256,1000},
   {SPRITE_ID::Background_Asteroid_1, "assets/sprites/Background_Asteroid_1.png"},
   {SPRITE_ID::Background_Asteroid_2, "assets/sprites/Background_Asteroid_2.png"},
 };
-
 SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer, const uint64_t* ticks_total){  
+  /*
   if(entity->id == ENTITY_ID::PLAYER && entity->action == Actions::ROTATING){
     Sprite* spritesheet = GetSprite(SPRITE_ID::Medusa_Rotate, spritebuffer);
     
@@ -90,9 +92,11 @@ SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer,
     int current_frame = (((int)lerp(start, end, entity->progress_01) + sprite_count) % sprite_count);
     return {current_frame, spritesheet};
   }
-  
+  */
   switch (entity->id) {
     case ENTITY_ID::PLAYER:{
+
+      /*
       Sprite* sprite = nullptr;
       int frame = 0;
       switch (entity->facing_current) {
@@ -113,7 +117,9 @@ SpriteRenderInfo GetSprite_FromEntityState(Entity* entity, Sprite* spritebuffer,
         frame = (int)((*ticks_total * sprite->framerate) / FPS % GetSpriteCount(sprite));
         return {frame, sprite};
       }
-    }
+        */
+    return GetSprite(SPRITE_ID::Alien_Sprite, spritebuffer);
+    } 
     case ENTITY_ID::ROCK:
     return GetSprite(SPRITE_ID::Rock, spritebuffer);
     case ENTITY_ID::TEST_ENTITY:

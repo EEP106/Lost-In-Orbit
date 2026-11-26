@@ -339,7 +339,8 @@ extern "C" {
         entity->progress_01 += MOVE_SPEED * dt;
         break;
         case Actions::ROTATING:
-        entity->progress_01 += 8 * dt;
+        // Change the variable after progress_01 for the speed of rotating (higher is faster)
+        entity->progress_01 += 100 * dt;
         break;
       }
     }

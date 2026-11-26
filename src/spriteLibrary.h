@@ -6,10 +6,10 @@
 enum class SPRITE_ID{
   Fallback,
   Rock,
-  Medusa_Rotate,
-  Medusa_Idle_Left,
-  Medusa_Idle_Front,
-  Medusa_Idle_Back,
+  //Medusa_Rotate,
+  //Medusa_Idle_Left,
+  //Medusa_Idle_Front,
+  //Medusa_Idle_Back,
   Slime,
   Dropshadow,
   titlescreen_background,
@@ -24,6 +24,7 @@ enum class SPRITE_ID{
   Menu_Middle,
   Menu_Front,
   Button_Basic,
+  Alien_Sprite,
   test_entity,
   Background_Asteroid_1,
   Background_Asteroid_2
