@@ -3,9 +3,6 @@
 #include "levels.h"
 #include "movement.h"
 #include "command.h"
-#include <algorithm>
-#include <cstring>
-
 
 void MoveSlime(Memory::Arena* arena_scratch, LevelData* level, CommandBuffer* command, int xDir, int yDir){
   int slimeCount = 0;
