@@ -134,3 +134,25 @@ void MoveSlime(Memory::Arena* arena_scratch, LevelData* level, CommandBuffer* co
     }
   }
 }
+
+bool TryShuffle(LevelData* level, CommandBuffer* command, int xDir, int yDir){
+  bool hasShuffled = false;
+  for (int i = 0; i < level->entityCount; i++){
+    Entity* player = &level->entityBuffer[i];
+    if (!player->active) continue;
+    if (player->id != ENTITY_ID::PLAYER) continue;
+
+    Entity* inFront = GetEntity(level, player->x + xDir, player->y + yDir);
+    if (inFront == nullptr) continue;
+    if (!inFront->active) continue;
+    if (inFront->id != ENTITY_ID::SLIME) continue;
+
+    MoveCommand movePlayer(player, xDir, yDir);
+    MoveCommand moveSlime(inFront, -xDir, -yDir);
+    Queue(command, movePlayer);
+    Queue(command, moveSlime);
+    hasShuffled = true;
+  }
+
+  return hasShuffled;
+}
