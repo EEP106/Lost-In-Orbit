@@ -241,6 +241,9 @@ extern "C" {
         MoveSlime(arena_scratch, level, gameplay->commandBuffer, xDir, yDir);
         return QueueActionResult::Move;
       }
+      else if (TryShuffle(level, gameplay->commandBuffer, xDir, yDir)){
+        return QueueActionResult::Move;
+      }
       return QueueActionResult::MoveFailed;
     }
     
@@ -403,6 +406,8 @@ extern "C" {
       case QueueActionResult::Move:
       Flush(gameplay->commandBuffer, level);
       gameplay->commandBuffer->timestamp++;
+      gameplay->input_buffer_read_count++;
+      break;
       case QueueActionResult::MoveFailed:
       gameplay->input_buffer_read_count++;
       break;

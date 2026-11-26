@@ -3,9 +3,18 @@
 #include "levels.h"
 #include "movement.h"
 #include "command.h"
-#include <algorithm>
-#include <cstring>
 
+bool EntityHasMoveQueued(CommandBuffer* command, Entity* entity){
+  for(int i = command->index; i < command->queueHead; i++){
+    AnyCommand cmd = command->allCommands[i];
+    if (cmd.command.type != CMD_TYPE::MOVE) continue; 
+
+    MoveCommand move = cmd.move;
+    if (move.entity == entity) return true;
+  }
+
+  return false;
+}
 
 void MoveSlime(Memory::Arena* arena_scratch, LevelData* level, CommandBuffer* command, int xDir, int yDir){
   int slimeCount = 0;
@@ -132,8 +141,30 @@ void MoveSlime(Memory::Arena* arena_scratch, LevelData* level, CommandBuffer* co
       MoveCommand move(slime, xDir, yDir);
       Queue(command, move);
     }
-    else{
+    else if(EntityHasMoveQueued(command, entityInFront)){
       TryMove(slime, level, command, xDir, yDir, 1);
     }
   }
+}
+
+bool TryShuffle(LevelData* level, CommandBuffer* command, int xDir, int yDir){
+  bool hasShuffled = false;
+  for (int i = 0; i < level->entityCount; i++){
+    Entity* player = &level->entityBuffer[i];
+    if (!player->active) continue;
+    if (player->id != ENTITY_ID::PLAYER) continue;
+
+    Entity* inFront = GetEntity(level, player->x + xDir, player->y + yDir);
+    if (inFront == nullptr) continue;
+    if (!inFront->active) continue;
+    if (inFront->id != ENTITY_ID::SLIME) continue;
+
+    MoveCommand movePlayer(player, xDir, yDir);
+    MoveCommand moveSlime(inFront, -xDir, -yDir);
+    Queue(command, movePlayer);
+    Queue(command, moveSlime);
+    hasShuffled = true;
+  }
+
+  return hasShuffled;
 }
