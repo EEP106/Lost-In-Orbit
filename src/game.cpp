@@ -30,6 +30,7 @@
 static bool g_show_walkable_outlines = false;
 
 static const char* LEVEL_PATHS[] = {
+  "assets/levels/level_Test.tmj",
   "assets/levels/level_01.tmj",
   "assets/levels/level_02.tmj",
 };

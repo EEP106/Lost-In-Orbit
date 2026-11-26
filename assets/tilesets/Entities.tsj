@@ -13,20 +13,16 @@
  "tileheight":1024,
  "tiles":[
         {
-         "height":16,
          "id":0,
          "image":"..\/sprites\/Alien_Idle_Down.png",
-         "imageheight":24,
-         "imagewidth":96,
+         "imageheight":1024,
+         "imagewidth":512,
          "properties":[
                 {
                  "name":"entity_name",
                  "type":"string",
-                 "value":"medusa"
-                }],
-         "width":16,
-         "x":3,
-         "y":6
+                 "value":"alien"
+                }]
         }, 
         {
          "id":1,

@@ -34,7 +34,7 @@ static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Space_Test_Background, "assets/sprites/Space_Test_Background.png"},
   {SPRITE_ID::selection_marker, "assets/sprites/selection_marker.png",9,9},
   {.id = SPRITE_ID::dungeon_tileset, .path = "assets/sprites/Lost_In_Orbit_Tileset.png", .pivot_x = 0, .pivot_y = 0, .cell_width = 512, .cell_height = 512},
-  {SPRITE_ID::Goal, "assets/sprites/goal.png",8, 8, 8, 1},
+  {SPRITE_ID::Goal, "assets/sprites/goal.png"},
   {SPRITE_ID::Menu_Horizon, "assets/sprites/mainmenu_background.png"},
   {SPRITE_ID::Menu_Cloud_Back, "assets/sprites/mainmenu_cloud_back.png"},
   {SPRITE_ID::Menu_Cloud_Front, "assets/sprites/mainmenu_cloud_front.png"},
