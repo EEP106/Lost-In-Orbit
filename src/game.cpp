@@ -20,6 +20,7 @@
 #include "spriteLibrary.h"
 #include "levelRenderer.h"
 #include "tilesetLibrary.h"
+#include "rippleShaders.h"
 #include "movement.h"
 #include "slime.h"
 #include <cmath>
@@ -119,101 +120,101 @@ extern "C" {
   
   void UpdateTitlescreen(TitleScreen* titlescreen, const float dt){
   }
-static const int PAUSE_BUTTON_COUNT = 3;
-static Button g_pause_buttons[PAUSE_BUTTON_COUNT];
-static bool g_pause_ready = false;
-static float g_pause_w = SCREEN_WIDTH;
-static float g_pause_h = SCREEN_HEIGHT;
-
-static void InitPauseButtons(GameData* data){
-  if(g_pause_ready) return;
+  static const int PAUSE_BUTTON_COUNT = 3;
+  static Button g_pause_buttons[PAUSE_BUTTON_COUNT];
+  static bool g_pause_ready = false;
+  static float g_pause_w = SCREEN_WIDTH;
+  static float g_pause_h = SCREEN_HEIGHT;
+  
+  static void InitPauseButtons(GameData* data){
+    if(g_pause_ready) return;
     const ButtonType types[PAUSE_BUTTON_COUNT] = {ButtonType::RESUME, ButtonType::MAIN_MENU, ButtonType::QUIT};
     const char* labels[PAUSE_BUTTON_COUNT] = {"Resume", "Main Menu", "Quit"};
-  for(int i = 0; i < PAUSE_BUTTON_COUNT; i++){
-    SetupButton(&g_pause_buttons[i], types[i], data->spriteBuffer, {0, 0, 300, 80}, Alignment::Centered, &data->font, labels[i]);
-    g_pause_buttons[i].is_dynamic = true;
-    g_pause_buttons[i].sprite = GetSprite(SPRITE_ID::Button_Basic, data->spriteBuffer);
+    for(int i = 0; i < PAUSE_BUTTON_COUNT; i++){
+      SetupButton(&g_pause_buttons[i], types[i], data->spriteBuffer, {0, 0, 300, 80}, Alignment::Centered, &data->font, labels[i]);
+      g_pause_buttons[i].is_dynamic = true;
+      g_pause_buttons[i].sprite = GetSprite(SPRITE_ID::Button_Basic, data->spriteBuffer);
+    }
+    g_pause_ready = true;
   }
-  g_pause_ready = true;
-}
-
-static void LayoutPauseButtons(){
-  const float spacing = 100.0f;
-  for(int i = 0; i < PAUSE_BUTTON_COUNT; i++){
-    Button* b = &g_pause_buttons[i];
-    b->rect.x = g_pause_w / 2.0f - b->rect.w / 2.0f;
-    b->rect.y = g_pause_h / 2.0f + (i - (PAUSE_BUTTON_COUNT - 1) / 2.0f) * spacing - b->rect.h / 2.0f;
+  
+  static void LayoutPauseButtons(){
+    const float spacing = 100.0f;
+    for(int i = 0; i < PAUSE_BUTTON_COUNT; i++){
+      Button* b = &g_pause_buttons[i];
+      b->rect.x = g_pause_w / 2.0f - b->rect.w / 2.0f;
+      b->rect.y = g_pause_h / 2.0f + (i - (PAUSE_BUTTON_COUNT - 1) / 2.0f) * spacing - b->rect.h / 2.0f;
+    }
   }
-}
-
-static void PressPauseButton(Button* button, GameData* data){
-  switch(button->type){
-    case ButtonType::RESUME:
+  
+  static void PressPauseButton(Button* button, GameData* data){
+    switch(button->type){
+      case ButtonType::RESUME:
       data->scenes.gameplay.paused = false;
       break;
-    case ButtonType::MAIN_MENU:
+      case ButtonType::MAIN_MENU:
       data->scenes.gameplay.paused = false;
       ChangeScene(data, SCENE_TYPES::MAINMENU);
       break;
-    case ButtonType::QUIT:
+      case ButtonType::QUIT:
       data->running = false;
       break;
-    default:
+      default:
       break;
+    }
   }
-}
-
-static void UpdatePauseMenu(GameData* data){
-  Input* input = &data->input;
-  int& index = data->scenes.gameplay.pause_index;
-  InitPauseButtons(data);
-  LayoutPauseButtons();
-
-  if(input->mouse_magnitude > 0.1){
+  
+  static void UpdatePauseMenu(GameData* data){
+    Input* input = &data->input;
+    int& index = data->scenes.gameplay.pause_index;
+    InitPauseButtons(data);
+    LayoutPauseButtons();
+    
+    if(input->mouse_magnitude > 0.1){
+      for(int i = 0; i < PAUSE_BUTTON_COUNT; i++){
+        if(IsHoveredOver(&g_pause_buttons[i], input->mouse_x, input->mouse_y)){
+          index = i;
+          break;
+        }
+      }
+    }
+    if(KeyPressed(input, SDL_SCANCODE_UP)){
+      index = (index - 1 + PAUSE_BUTTON_COUNT) % PAUSE_BUTTON_COUNT;
+    }
+    if(KeyPressed(input, SDL_SCANCODE_DOWN)){
+      index = (index + 1) % PAUSE_BUTTON_COUNT;
+    }
+    
+    Button* selected = &g_pause_buttons[index];
+    bool clicked = MousePressed(input, MouseButtons::LEFT) && IsHoveredOver(selected, input->mouse_x, input->mouse_y);
+    if(KeyPressed(input, SDL_SCANCODE_RETURN) || clicked){
+      PressPauseButton(selected, data);
+    }
+  }
+  
+  static void DrawPauseMenu(GameData* data, SDL_Renderer* renderer, float w, float h){
+    g_pause_w = w;
+    g_pause_h = h;
+    InitPauseButtons(data);
+    LayoutPauseButtons();
+    int index = data->scenes.gameplay.pause_index;
+    
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 160);
+    SDL_FRect full = {0, 0, w, h};
+    SDL_RenderFillRect(renderer, &full);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+    
     for(int i = 0; i < PAUSE_BUTTON_COUNT; i++){
-      if(IsHoveredOver(&g_pause_buttons[i], input->mouse_x, input->mouse_y)){
-        index = i;
-        break;
+      Button* b = &g_pause_buttons[i];
+      if(b->is_dynamic){
+        RenderButton_Dynamic(b, i == index, renderer);
+      }
+      else{
+        RenderButton(b, i == index, renderer);
       }
     }
   }
-  if(KeyPressed(input, SDL_SCANCODE_UP)){
-    index = (index - 1 + PAUSE_BUTTON_COUNT) % PAUSE_BUTTON_COUNT;
-  }
-  if(KeyPressed(input, SDL_SCANCODE_DOWN)){
-    index = (index + 1) % PAUSE_BUTTON_COUNT;
-  }
-
-  Button* selected = &g_pause_buttons[index];
-  bool clicked = MousePressed(input, MouseButtons::LEFT) && IsHoveredOver(selected, input->mouse_x, input->mouse_y);
-  if(KeyPressed(input, SDL_SCANCODE_RETURN) || clicked){
-    PressPauseButton(selected, data);
-  }
-}
-
-static void DrawPauseMenu(GameData* data, SDL_Renderer* renderer, float w, float h){
-  g_pause_w = w;
-  g_pause_h = h;
-  InitPauseButtons(data);
-  LayoutPauseButtons();
-  int index = data->scenes.gameplay.pause_index;
-
-  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 160);
-  SDL_FRect full = {0, 0, w, h};
-  SDL_RenderFillRect(renderer, &full);
-  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
-
-  for(int i = 0; i < PAUSE_BUTTON_COUNT; i++){
-    Button* b = &g_pause_buttons[i];
-    if(b->is_dynamic){
-      RenderButton_Dynamic(b, i == index, renderer);
-    }
-    else{
-      RenderButton(b, i == index, renderer);
-    }
-  }
-}
   enum class QueueActionResult {Nothing, Rotate, Move, MoveFailed};
   
   QueueActionResult QueueAction(Gameplay* gameplay, LevelData* level, Arena* arena_scratch){
@@ -420,10 +421,10 @@ static void DrawPauseMenu(GameData* data, SDL_Renderer* renderer, float w, float
     
     // "Freezes" the game when paused my making animations and movement of background assets pause
     bool is_paused = data->scene_current == SCENE_TYPES::GAME && gameplay->paused;
-      if(!is_paused){
+    if(!is_paused){
       *data->ticks_total += 1;
-  }
-
+    }
+    
     if(KeyPressed(&data->input, SDL_SCANCODE_F2)){
       editorData->edit_level = !editorData->edit_level;
     }
@@ -468,17 +469,17 @@ static void DrawPauseMenu(GameData* data, SDL_Renderer* renderer, float w, float
       UpdateMenu(data);
       break;
       case SCENE_TYPES::GAME:
-        if(KeyPressed(&data->input, SDL_SCANCODE_ESCAPE)){
-          gameplay->paused = !gameplay->paused;
-          gameplay->pause_index = 0;
-        }
-        if(gameplay->paused){
-          UpdatePauseMenu(data);
-        }
-        else{
-          UpdateGame(gameplay, &data->input, data->arena_scratch, data->arena_commands, data->arena_entities, dt);
-        }
-        break;
+      if(KeyPressed(&data->input, SDL_SCANCODE_ESCAPE)){
+        gameplay->paused = !gameplay->paused;
+        gameplay->pause_index = 0;
+      }
+      if(gameplay->paused){
+        UpdatePauseMenu(data);
+      }
+      else{
+        UpdateGame(gameplay, &data->input, data->arena_scratch, data->arena_commands, data->arena_entities, dt);
+      }
+      break;
       case SCENE_TYPES::CREDITS:
       break;
       case SCENE_TYPES::NONE:
@@ -529,31 +530,34 @@ static void DrawPauseMenu(GameData* data, SDL_Renderer* renderer, float w, float
       break;
       case SCENE_TYPES::GAME:{
         
-        //renders the bakground in level
         Sprite* level_background = GetSprite(SPRITE_ID::Space_Test_Background, data->spriteBuffer);
         int w, h;
         SDL_GetCurrentRenderOutputSize(renderer, &w, &h);
+        float ticks = (float)(*data->ticks_total) / FPS;   // freezes while paused
+        
         float scale = std::max((float)w / level_background->width, (float)h / level_background->height) / UPSCALE_FACTOR;
+        scale *= 1.02f; // 2% scale up so the ripple effect doesn't show the edges of the background sprite
+        SHADERS::BeginRipple(renderer, 0, {ticks, 0.004f, 3.0f, 1.2f, 0.0f});
         RenderSprite_World(level_background, renderer, nullptr, w / 2.0f, h / 2.0f, scale);
+        SHADERS::EndRipple(renderer);
         
         Sprite* background_asset = GetSprite(SPRITE_ID::Background_Asteroid_1, data->spriteBuffer);
         Sprite* background_asset_2 = GetSprite(SPRITE_ID::Background_Asteroid_2, data->spriteBuffer);
-        SDL_GetCurrentRenderOutputSize(renderer, &w, &h);
         float asset_scale_background_asset = std::max((float)w / background_asset->width, (float)h / background_asset->height) / (UPSCALE_FACTOR*3);
         float asset_scale_background_asset_2 = std::max((float)w / background_asset_2->width, (float)h / background_asset_2->height) / (UPSCALE_FACTOR*3);
+        float asteroid_speed = 0.02f;
         
-        
-        float t = (float)(*data->ticks_total) / FPS;   // seconds since level start
-        float asteroid_speed = 0.05f;                  // window widths per second
-        
-        // first and second float is startpos in window lengths (0.0 lest most pos of creen 1 is rightmost), last float is when the movement repeats so 1.1 is 10% of screen etc.
-        float background_asset_x = -0.15f + fmodf(t * asteroid_speed, 1.4f);
+        float background_asset_x = -0.15f + fmodf(ticks * asteroid_speed, 1.4f);
         float background_asset_y = 0.3f;
+        //SHADERS::BeginRipple(renderer, 1, {ticks, 0.01f, 4.0f, 1.6f, 1.0f});
         RenderSprite_World(background_asset, renderer, nullptr, w * background_asset_x, h * background_asset_y, asset_scale_background_asset);
+        //SHADERS::EndRipple(renderer);
         
-        float background_asset_2_x = 1.15f - fmodf(t * asteroid_speed, 1.4f);
+        float background_asset_2_x = 1.15f - fmodf(ticks * asteroid_speed, 1.4f);
         float background_asset_2_y = 0.7f;
+        //SHADERS::BeginRipple(renderer, 2, {ticks, 0.01f, 4.0f, 1.6f, 3.0f});
         RenderSprite_World(background_asset_2, renderer, nullptr, w * background_asset_2_x, h * background_asset_2_y, asset_scale_background_asset_2);
+        //SHADERS::EndRipple(renderer);
         
         RenderLevel(data, renderer);
         if(g_show_walkable_outlines){
@@ -605,8 +609,10 @@ static void DrawPauseMenu(GameData* data, SDL_Renderer* renderer, float w, float
     
     void OnQuit(SDL_Renderer* renderer){
       SDL_DestroyRenderer(renderer);
+      SHADERS::KillRipple(renderer);
     }
     
   }
+  
   
   

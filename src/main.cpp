@@ -16,6 +16,7 @@
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_video.h"
 #include "SDL_TTF/SDL_ttf.h"
+#include "SDL3/SDL_gpu.h"
 #include "command.h"
 #include "common.h"
 #include "arena.h"
@@ -121,7 +122,18 @@ void SDL_Setup(){
     TTF_Init();
     
     window = SDL_CreateWindow("lost in orbit", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
-    renderer = SDL_CreateRenderer(window, NULL);
+    
+    SDL_GPUDevice* gpu_device = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, false, nullptr);
+    if(gpu_device != nullptr){
+        renderer = SDL_CreateGPURenderer(gpu_device, window);
+        if(renderer == nullptr){
+            SDL_DestroyGPUDevice(gpu_device);
+        }
+    }
+    if(renderer == nullptr){
+        printf("GPU renderer unavailable (%s), using the default renderer \n", SDL_GetError());
+        renderer = SDL_CreateRenderer(window, NULL);
+    }
 }
 
 void CalculateDeltaTime(float* dt, float scaler){
