@@ -85,10 +85,11 @@ void RenderEntities(GameData* data, SDL_Renderer* renderer){
       RenderSprite_OnTile(dropshadow, lvl, renderer, &data->camera, x_animated, ground_y, 1, 0.4, false);
     }
     
+    RenderSprite_OnTile(sprite, lvl, renderer, &data->camera, x_animated, y_animated, 1, 1, false);
+
     if(entity == activeEntity){
       SpriteRenderInfo selection_marker = GetSprite(SPRITE_ID::Slime, data->spriteBuffer);  
       RenderSprite_OnTile(selection_marker, lvl, renderer, &data->camera, x_animated, ground_y);
     }
-    RenderSprite_OnTile(sprite, lvl, renderer, &data->camera, x_animated, y_animated, 1, 1, false);
   }        
 }
