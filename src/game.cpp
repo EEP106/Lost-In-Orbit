@@ -580,15 +580,15 @@ extern "C" {
         
         float background_asset_x = -0.15f + fmodf(ticks * asteroid_speed, 1.4f);
         float background_asset_y = 0.3f;
-        //SHADERS::BeginRipple(renderer, 1, {ticks, 0.01f, 4.0f, 1.6f, 1.0f});
+        SHADERS::BeginRipple(renderer, 1, {ticks, 0.01f, 2.0f, 0.6f, 1.0f});
         RenderSprite_World(background_asset, renderer, nullptr, w * background_asset_x, h * background_asset_y, asset_scale_background_asset);
-        //SHADERS::EndRipple(renderer);
+        SHADERS::EndRipple(renderer);
         
         float background_asset_2_x = 1.15f - fmodf(ticks * asteroid_speed, 1.4f);
         float background_asset_2_y = 0.7f;
-        //SHADERS::BeginRipple(renderer, 2, {ticks, 0.01f, 4.0f, 1.6f, 3.0f});
+        SHADERS::BeginRipple(renderer, 2, {ticks, 0.01f, 2.0f, 0.6f, 3.0f});
         RenderSprite_World(background_asset_2, renderer, nullptr, w * background_asset_2_x, h * background_asset_2_y, asset_scale_background_asset_2);
-        //SHADERS::EndRipple(renderer);
+        SHADERS::EndRipple(renderer);
         
         RenderLevel(data, renderer);
         if(g_show_walkable_outlines){
