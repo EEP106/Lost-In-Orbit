@@ -51,8 +51,8 @@ static const char* LEVEL_TEXTS[] = {
   "Slime sticks to you", // level_02
   "Use the slime to cross gaps", // level_03
   "Use the enviroment to move inside the slime", // level_04
-  "Use the enviroment to reshape yourself", // level_05
-  " ", // level_06
+  "Z to undo, R to reset. ", // level_05
+  "Use the enviroment to reshape yourself", // level_06
   " ", // level_07
   " ", // level_08
   " ", // level_09
