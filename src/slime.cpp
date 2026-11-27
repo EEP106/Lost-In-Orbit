@@ -4,6 +4,19 @@
 #include "movement.h"
 #include "command.h"
 
+Entity* GetSlime(Entity** slimeBuffer, int slimeCount, int x, int y, int* slimeIndex = nullptr){
+  for (int i = 0; i < slimeCount; i++){
+    Entity* slime = slimeBuffer[i];
+    if (slime->x != x) continue;
+    if (slime->y != y) continue;
+
+    if (slimeIndex != nullptr) *slimeIndex = i;
+    return slime;
+  }
+
+  return nullptr;
+}
+
 bool EntityHasMoveQueued(CommandBuffer* command, Entity* entity){
   for(int i = command->index; i < command->queueHead; i++){
     AnyCommand cmd = command->allCommands[i];
@@ -69,7 +82,7 @@ void MoveSlime(Memory::Arena* arena_scratch, LevelData* level, CommandBuffer* co
       
       Entity* slime = slimeBuffer[i];
       int moveIntoEntityIndex = 0;
-      Entity* moveIntoEntity = GetEntity(*slimeBuffer, slimeCount, slime->x + xDir, slime->y + yDir, &moveIntoEntityIndex);
+      Entity* moveIntoEntity = GetSlime(slimeBuffer, slimeCount, slime->x + xDir, slime->y + yDir, &moveIntoEntityIndex);
 
       if (moveIntoEntity == nullptr) continue;
       if (slimeMovableStates[moveIntoEntityIndex] == SlimeMovable::Blocked){
@@ -87,11 +100,13 @@ void MoveSlime(Memory::Arena* arena_scratch, LevelData* level, CommandBuffer* co
 
     for (int j = 0; j < 4; j++){
       Direction dir = (Direction)j;
-      int xDir = 0, yDir = 0;
-      XYFromDirection(dir, xDir, yDir);
+      int xPos, yPos;
+      XYFromDirection(dir, xPos, yPos);
+      xPos += player->x;
+      yPos += player->y;
 
       int intoEntityIndex;
-      Entity* intoEntity = GetEntity(*slimeBuffer, slimeCount, player->x + xDir, player->y + yDir, &intoEntityIndex);
+      Entity* intoEntity = GetSlime(slimeBuffer, slimeCount, xPos, yPos, &intoEntityIndex);
       if (intoEntity == nullptr) continue;
       if (!intoEntity->active) continue;
       if (slimeMovableStates[intoEntityIndex] != SlimeMovable::Undetermined) continue;
@@ -110,11 +125,13 @@ void MoveSlime(Memory::Arena* arena_scratch, LevelData* level, CommandBuffer* co
 
       for (int j = 0; j < 4; j++){
         Direction dir = (Direction)j;
-        int xDir, yDir = 0;
-        XYFromDirection(dir, xDir, yDir);
+        int xPos, yPos;
+        XYFromDirection(dir, xPos, yPos);
+        xPos += slime->x;
+        yPos += slime->y;
 
         int intoEntityIndex;
-        Entity* intoEntity = GetEntity(*slimeBuffer, slimeCount, slime->x + xDir, slime->y + yDir, &intoEntityIndex);
+        Entity* intoEntity = GetSlime(slimeBuffer, slimeCount, xPos, yPos, &intoEntityIndex);
         if (intoEntity == nullptr) continue;
         if (!intoEntity->active) continue;
 
