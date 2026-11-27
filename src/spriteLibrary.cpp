@@ -15,7 +15,7 @@ const char* FALLBACK_PATH = "assets/sprites/fallback.png";
 
 static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Fallback, FALLBACK_PATH,8,8},
-  {SPRITE_ID::Rock, "assets/sprites/rock.png", 256, 328},
+  {SPRITE_ID::Rock, "assets/sprites/fallback.png"},
   //{SPRITE_ID::Medusa_Rotate, "assets/sprites/medusa_rotate.png", 12, 24, 8, 1},
   /*{
   .id = SPRITE_ID::Medusa_Idle_Left,
@@ -50,7 +50,7 @@ static const SpriteDataEntry all_sprite_data[] = {
   {SPRITE_ID::Alien_Walk_Left, "assets/sprites/Alien_Walk_Left.png", 256, 872, 4, 1, 2},
   {SPRITE_ID::Alien_Walk_Up, "assets/sprites/Alien_Walk_Up.png", 256, 872, 4, 1, 2},
   {SPRITE_ID::Alien_Walk_Down, "assets/sprites/Alien_Walk_Down.png", 256, 872, 4, 1, 2},
-  {SPRITE_ID::test_entity, "assets/sprites/Test_Entity.png",256,1000},
+  {SPRITE_ID::test_entity, "assets/sprites/fallback.png"},
   {SPRITE_ID::Background_Asteroid_1, "assets/sprites/Background_Asteroid_1.png"},
   {SPRITE_ID::Background_Asteroid_2, "assets/sprites/Background_Asteroid_2.png"},
 };
