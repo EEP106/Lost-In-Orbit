@@ -47,7 +47,7 @@ static const char* LEVEL_PATHS[] = {
 // Every level need a level text or it crashes
 static const char* LEVEL_TEXTS[] = {
   "Test level", // level_Test
-  "Arrow keys to move Z to undo R to reset (press ESC to pause to look at the controlls)", // level_01
+  "Arrow keys to move (press ESC to pause to look at the controls)", // level_01
   "Slime sticks to you", // level_02
   "Use the slime to cross gaps", // level_03
   "Use the enviroment to move inside the slime", // level_04
@@ -297,11 +297,7 @@ extern "C" {
       }
     }
     
-    float undo_speed_up = std::lerp(1.0, 0.15, (gameplay->commandBuffer->head - gameplay->commandBuffer->index) * (1.0/30.0));
-    if(undo_speed_up < 0.15){
-      undo_speed_up = 0.15;
-    }
-    if(KeyPressed(input, SDL_SCANCODE_Z) || KeyHeld_ForTime(input, SDL_SCANCODE_Z, UNDO_REPEAT_TIME * undo_speed_up)){
+    if(KeyPressed(input, SDL_SCANCODE_Z) || KeyHeld_ForTime(input, SDL_SCANCODE_Z, UNDO_REPEAT_TIME / (speed_factor * 2))){
       ResetKeyHeldTime(input, SDL_SCANCODE_Z);
       if(KeyHeld(input, SDL_SCANCODE_LSHIFT)){
         Redo(gameplay->commandBuffer, GetCurrentLevel(gameplay));
@@ -585,7 +581,7 @@ extern "C" {
         Sprite* background_asset_2 = GetSprite(SPRITE_ID::Background_Asteroid_2, data->spriteBuffer);
         float asset_scale_background_asset = std::max((float)w / background_asset->width, (float)h / background_asset->height) / (UPSCALE_FACTOR*3);
         float asset_scale_background_asset_2 = std::max((float)w / background_asset_2->width, (float)h / background_asset_2->height) / (UPSCALE_FACTOR*3);
-        float asteroid_speed = 0.02f;
+        float asteroid_speed = 0.007f;
         
         float background_asset_x = -0.15f + fmodf(ticks * asteroid_speed, 1.4f);
         float background_asset_y = 0.3f;
