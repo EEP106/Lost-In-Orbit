@@ -46,7 +46,7 @@ static const char* LEVEL_PATHS[] = {
 // Every level need a level text or it crashes
 static const char* LEVEL_TEXTS[] = {
   "Test level", // level_Test
-  "Arrow keys to move Z to undo R to reset", // level_01
+  "Arrow keys to move Z to undo R to reset (press ESC to pause to look at the controlls)", // level_01
   "Slime sticks to you", // level_02
   "Use the slime to cross gaps", // level_03
   "Use the enviroment to move inside the slime", // level_04
@@ -352,7 +352,7 @@ extern "C" {
           goals_reached++;
         }
       }
-      if(goals_reached == level->goalCount){
+      if(goals_reached == level->goalCount && !are_entities_acting){
         gameplay->currentLevelIndex++;
         StartLevel(gameplay, arena_commands, arena_entities);
         return;
@@ -607,6 +607,11 @@ extern "C" {
         }
         if(data->scenes.gameplay.paused){
           DrawPauseMenu(data, renderer, (float)w, (float)h);
+          RenderText(&data->font, "Arrow keys for movement", renderer, nullptr, 50, h * 0.7f, Alignment::Left);
+          RenderText(&data->font, "Z to undo", renderer, nullptr, 50, h * 0.75f, Alignment::Left);
+          RenderText(&data->font, "Shift + Z to redo", renderer, nullptr, 50, h * 0.8f, Alignment::Left);
+          RenderText(&data->font, "R to reset", renderer, nullptr, 50, h * 0.85f, Alignment::Left);
+          RenderText(&data->font, "Space to speed up", renderer, nullptr, 50, h * 0.9f, Alignment::Left);
         }
         break;}
         case SCENE_TYPES::CREDITS:

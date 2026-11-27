@@ -11,7 +11,7 @@ constexpr size_t AUDIO_MEMORY_ALLOWANCE = MEGABYTES(5);
 constexpr int FPS = 240;
 constexpr double FRAME_TIME_MS = 1000.0 / FPS;
 
-const float UNDO_REPEAT_TIME = 0.15;
+const float UNDO_REPEAT_TIME = 0.3;
 const float MOVE_SPEED = 3.0;
 const int SCREEN_WIDTH = 1900;
 const int SCREEN_HEIGHT = 1000;
