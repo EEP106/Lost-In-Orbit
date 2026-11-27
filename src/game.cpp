@@ -295,11 +295,7 @@ extern "C" {
       }
     }
     
-    float undo_speed_up = std::lerp(1.0, 0.15, (gameplay->commandBuffer->head - gameplay->commandBuffer->index) * (1.0/30.0));
-    if(undo_speed_up < 0.15){
-      undo_speed_up = 0.15;
-    }
-    if(KeyPressed(input, SDL_SCANCODE_Z) || KeyHeld_ForTime(input, SDL_SCANCODE_Z, UNDO_REPEAT_TIME * undo_speed_up)){
+    if(KeyPressed(input, SDL_SCANCODE_Z) || KeyHeld_ForTime(input, SDL_SCANCODE_Z, UNDO_REPEAT_TIME / (speed_factor * 2))){
       ResetKeyHeldTime(input, SDL_SCANCODE_Z);
       if(KeyHeld(input, SDL_SCANCODE_LSHIFT)){
         Redo(gameplay->commandBuffer, GetCurrentLevel(gameplay));
