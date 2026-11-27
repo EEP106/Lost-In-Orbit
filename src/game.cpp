@@ -352,7 +352,7 @@ extern "C" {
           goals_reached++;
         }
       }
-      if(goals_reached == level->goalCount){
+      if(goals_reached == level->goalCount && !are_entities_acting){
         gameplay->currentLevelIndex++;
         StartLevel(gameplay, arena_commands, arena_entities);
         return;
