@@ -67,8 +67,10 @@ struct Scenes{
 };
 
 struct EditorData{
+  bool showDevPanel; 
   float* fps_buffer;
   int fps_buffer_count;
+
   bool edit_level;
   Editor editor;
   int fps_buffer_index;

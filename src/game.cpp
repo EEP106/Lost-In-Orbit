@@ -460,6 +460,9 @@ extern "C" {
       *data->ticks_total += speeding_up ? SPEED_UP_MULTIPLIER : 1;
     }
     
+    if(KeyPressed(&data->input, SDL_SCANCODE_F1)){
+      editorData->showDevPanel = !editorData->showDevPanel;
+    }
     if(KeyPressed(&data->input, SDL_SCANCODE_F2)){
       editorData->edit_level = !editorData->edit_level;
     }
