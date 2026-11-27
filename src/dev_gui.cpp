@@ -111,47 +111,49 @@ void Draw_Level_List(GameData* data){
 }
 
 void DEV::Draw(GameData* data, SDL_Renderer* renderer){
-  ImGui::Begin("Dev Tools");
-  ImGui::Text("memory arena usage amount");
+  if(data->editor_data.showDevPanel){
+    ImGui::Begin("Dev Tools");
+    ImGui::Text("memory arena usage amount");
   
-  Draw_Imgui_Arena_Usage(data->arena_main, "all memory");
-  Draw_Imgui_Arena_Usage(data->arena_images, "images");
-  Draw_Imgui_Arena_Usage(data->arena_levels, "levels");
-  Draw_Imgui_Arena_Usage(data->arena_commands, "commands");
-  Draw_Imgui_Arena_Usage(data->arena_entities, "entities");
-  Draw_Imgui_Arena_Usage(data->arena_input, "input");
-  Draw_Imgui_Arena_Usage(data->arena_scratch, "scratch");
+    Draw_Imgui_Arena_Usage(data->arena_main, "all memory");
+    Draw_Imgui_Arena_Usage(data->arena_images, "images");
+    Draw_Imgui_Arena_Usage(data->arena_levels, "levels");
+    Draw_Imgui_Arena_Usage(data->arena_commands, "commands");
+    Draw_Imgui_Arena_Usage(data->arena_entities, "entities");
+    Draw_Imgui_Arena_Usage(data->arena_input, "input");
+    Draw_Imgui_Arena_Usage(data->arena_scratch, "scratch");
 
-  if(data->audio.initialized){
-    DrawAudioMemoryPanel(&data->audio);
-  }
- 
-  Draw_History(GetCurrentLevel(&data->scenes.gameplay), data->scenes.gameplay.commandBuffer);
-  DrawFPS(data);
-
-  ImGui::SliderFloat("deltaTimeScaler", data->dt_scaler, 0.1, 3);  
-  
-  Draw_Level_List(data);
-
-  if(ImGui::Button("reload level from file")){
-    Gameplay* gameplay = &data->scenes.gameplay;
-    if(gameplay->initialized){
-      LevelData* level = GetCurrentLevel(gameplay);
-
-      namespace fs = std::filesystem;
-      fs::path source = fs::path(SOURCE_ASSETS_DIR) / fs::path(level->level_path).lexically_relative("assets");
-      std::error_code ec;
-      fs::copy_file(source, level->level_path, fs::copy_options::overwrite_existing, ec);
-      if(ec){
-        printf("could not copy %s: %s\n", source.string().c_str(), ec.message().c_str());
-      }
-
-      CreateLevel(data->arena_levels, level, const_cast<Tileset*>(level->tileset), level->level_path);
-      StartLevel(gameplay, data->arena_commands, data->arena_entities);
+    if(data->audio.initialized){
+      DrawAudioMemoryPanel(&data->audio);
     }
-  }
+ 
+    Draw_History(GetCurrentLevel(&data->scenes.gameplay), data->scenes.gameplay.commandBuffer);
+    DrawFPS(data);
 
-  ImGui::End();
+    ImGui::SliderFloat("deltaTimeScaler", data->dt_scaler, 0.1, 3);  
+  
+    Draw_Level_List(data);
+
+    if(ImGui::Button("reload level from file")){
+      Gameplay* gameplay = &data->scenes.gameplay;
+      if(gameplay->initialized){
+        LevelData* level = GetCurrentLevel(gameplay);
+
+        namespace fs = std::filesystem;
+        fs::path source = fs::path(SOURCE_ASSETS_DIR) / fs::path(level->level_path).lexically_relative("assets");
+        std::error_code ec;
+        fs::copy_file(source, level->level_path, fs::copy_options::overwrite_existing, ec);
+        if(ec){
+          printf("could not copy %s: %s\n", source.string().c_str(), ec.message().c_str());
+        }
+
+        CreateLevel(data->arena_levels, level, const_cast<Tileset*>(level->tileset), level->level_path);
+        StartLevel(gameplay, data->arena_commands, data->arena_entities);
+      }
+    }
+
+    ImGui::End();
+  }
 
   if(data->editor_data.edit_level){
     EDITOR::DrawObjectPanel(&data->editor_data.editor, data->spriteBuffer);
