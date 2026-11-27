@@ -41,26 +41,22 @@
                 }]
         }, 
         {
-         "height":512,
          "id":2,
-         "image":"..\/sprites\/rock.png",
-         "imageheight":512,
-         "imagewidth":512,
+         "image":"..\/sprites\/fallback.png",
+         "imageheight":16,
+         "imagewidth":16,
          "properties":[
                 {
                  "name":"entity_name",
                  "type":"string",
                  "value":"rock"
-                }],
-         "width":512,
-         "x":2,
-         "y":3
+                }]
         }, 
         {
          "id":3,
-         "image":"..\/sprites\/test_entity.png",
-         "imageheight":1024,
-         "imagewidth":512,
+         "image":"..\/sprites\/fallback.png",
+         "imageheight":16,
+         "imagewidth":16,
          "properties":[
                 {
                  "name":"entity_name",
