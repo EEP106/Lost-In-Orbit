@@ -42,6 +42,7 @@ static const char* LEVEL_PATHS[] = {
   "assets/levels/level_08.tmj",
   "assets/levels/level_09.tmj",
   "assets/levels/level_10.tmj",
+  "assets/levels/level_end.tmj"
 };
 // Every level need a level text or it crashes
 static const char* LEVEL_TEXTS[] = {
@@ -50,12 +51,13 @@ static const char* LEVEL_TEXTS[] = {
   "Slime sticks to you", // level_02
   "Use the slime to cross gaps", // level_03
   "Use the enviroment to move inside the slime", // level_04
-  "If slime is not connected to another slime it will detatch", // level_05
+  "Use the enviroment to reshape yourself", // level_05
   " ", // level_06
   " ", // level_07
   " ", // level_08
   " ", // level_09
   " ", // level_10
+  "THANK YOU FOR PLAYING!"
 };
 
 extern "C" {
