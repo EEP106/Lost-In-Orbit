@@ -140,7 +140,7 @@ void DEV::Draw(GameData* data, SDL_Renderer* renderer){
         LevelData* level = GetCurrentLevel(gameplay);
 
         namespace fs = std::filesystem;
-        fs::path source = fs::path(SOURCE_ASSETS_DIR) / fs::path(level->level_path).lexically_relative("assets");
+        fs::path source = fs::path(level->level_path).lexically_relative("assets");
         std::error_code ec;
         fs::copy_file(source, level->level_path, fs::copy_options::overwrite_existing, ec);
         if(ec){
